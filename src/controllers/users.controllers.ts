@@ -10,12 +10,10 @@ import { RegisterReqBody } from '~/models/requests/User.request';
 import { ErrorWithStatus } from '~/utils/Error';
 
 export const loginController = (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  if (email === 'nmt6465@gmail.com' && password === '123456') {
-    res.status(200).json({ message: 'Login successfully' });
-  } else {
-    res.status(401).json({ message: 'Login failed!' });
-  }
+  // const user = { req };
+  // const { user_id } = user;
+  // userService.login(user_id);
+  res.status(200).json({ message: 'Login successfully' });
 };
 
 export const registerController = wrapRequestHandler(
@@ -36,4 +34,3 @@ export const registerController = wrapRequestHandler(
     }
   }
 );
-

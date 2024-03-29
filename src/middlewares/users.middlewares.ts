@@ -1,3 +1,4 @@
+import DatabaseService from '~/services/db.services';
 import USERS_MESSAGE from '~/constants/messages';
 import { checkSchema } from 'express-validator';
 import userService from '~/services/users.services';
@@ -15,11 +16,12 @@ export const loginValidator = validate(
       },
       trim: true,
       custom: {
-        options: async (value) => {
-          const result = await userService.checkEmailExist(value);
-          if (!result) {  
+        options: async (value, { req }) => {
+          const result = await DatabaseService.users.findOne({ email: value });
+          if (!result) {
             throw new Error(USERS_MESSAGE.USER_NOT_FOUND);
           }
+          req.user = result;
           return true;
         }
       }

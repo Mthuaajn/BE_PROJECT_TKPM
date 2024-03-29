@@ -4,7 +4,7 @@ import User from '~/models/schemas/User.schema';
 dotenv.config();
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@twitter.v7c7yrf.mongodb.net/?retryWrites=true&w=majority&appName=Twitter`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.c6hqecl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 class DatabaseService {
   private client: MongoClient;

@@ -18,6 +18,13 @@ class UserService {
       options: { expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN }
     });
   }
+  private async createTokens(user_id: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id)
+    ]);
+    return [accessToken, refreshToken];
+  }
   async register(payload: RegisterReqBody) {
     const result = await databaseService.users.insertOne(
       new User({
@@ -27,10 +34,7 @@ class UserService {
       })
     );
     const user_id = result.insertedId.toString();
-    const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
-    ]);
+    const [accessToken, refreshToken] = await this.createTokens(user_id);
     return {
       data: {
         result,
@@ -42,6 +46,13 @@ class UserService {
   async checkEmailExist(email: string) {
     const result = await databaseService.users.findOne({ email });
     return Boolean(result);
+  }
+  async login(user_id: string) {
+    const [accessToken, refreshToken] = await this.createTokens(user_id);
+    return {
+      accessToken,
+      refreshToken
+    };
   }
 }
 
