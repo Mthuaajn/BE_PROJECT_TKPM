@@ -17,9 +17,11 @@ export class DataSourceFactory {
         }
         return DataSourceFactory.instance;
     }
+    
     public registerDataSourcePlugin(name: string, dataSourcePlugin: IDataSourcePlugin):void {
         this.dataSourceMap.set(name, dataSourcePlugin);
     }
+
     public select(name: string): IDataSourcePlugin | null {
         
         if (this.dataSourceMap.has(name))
@@ -29,10 +31,14 @@ export class DataSourceFactory {
         return null;
     }
 
+    public getDataSourceMap(): Map<string,IDataSourcePlugin> {
+        return this.dataSourceMap;
+    }
+
     public loadPlugins(): void {
         let fileNames: string[] = getFileNamesInFolder(dataSourcePluginFolder);
         for (const name of fileNames) {
-            console.log("name: ",name)
+            console.log("load plugin name: ",name)
             let plugin: IDataSourcePlugin =  this.loadPluginFromFileName(name);
             this.registerDataSourcePlugin(name,plugin);
         }
