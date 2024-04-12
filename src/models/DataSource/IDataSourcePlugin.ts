@@ -1,7 +1,7 @@
 export interface IDataSourcePlugin {
-    name: string;
+  name: string;
 
-    search(title: string, page?: string): any;
-    clone(name: string): IDataSourcePlugin;
-    getBaseUrl(): string;
+  search(title: string, page?: string): any;
+  clone(name: string): IDataSourcePlugin;
+  getBaseUrl(): string;
 }

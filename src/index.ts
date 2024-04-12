@@ -9,6 +9,13 @@ import path from 'path';
 import { FileWatcher } from './models/FileWatcher';
 import { hostname } from 'os';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const esmRequire = require('esm')(module /*, options*/);
+// esmRequire('./index.ts');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('ts-node').register();
+require('./index.ts');
+
 const port = 3000;
 const host = '127.0.0.1';//'10.0.2.2';////'localhost';
 const app = express();
@@ -23,13 +30,13 @@ const fileWatcher = new FileWatcher(directoryToWatch);
 fileWatcher.startWatching();
 
 // Event listener for 'fileAdded' event
-fileWatcher.on('fileAdded', (filename) => {
+fileWatcher.on('fileAdded', async (filename) => {
   console.log(`New file added: ${filename}`);
   // Perform additional actions here
   dataSourceFactory.clearAllPlugins();
   dataSourceManager.clearAllPlugins();
 
-  dataSourceFactory.loadPlugins();
+  await dataSourceFactory.loadPlugins();
   dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
   //dataSourceManager.runPlugins();
 
