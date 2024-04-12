@@ -10,7 +10,7 @@ import { FileWatcher } from './models/FileWatcher';
 import { hostname } from 'os';
 
 const port = 3000;
-const host = 'localhost';
+const host = '127.0.0.1';//'10.0.2.2';////'localhost';
 const app = express();
 const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
