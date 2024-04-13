@@ -45,7 +45,7 @@ export class DataSourceManager {
 
     originalMap.forEach((value, key) => {
       newMap.set(key, value.clone(key));
-      console.log('deep cop: ', key);
+      //console.log('deep cop: ', key);
     });
 
     return newMap;
@@ -82,6 +82,12 @@ export class DataSourceManager {
     this.dataSourcePlugin.forEach((value, key) => {
       console.log(`Running plugin ${key} ...`);
       value.search(key);
+    });
+  }
+
+  public printAllPlugins(): void {
+    this.dataSourcePlugin.forEach((Value, key) => {
+      console.log(`Running plugin ${key} ...`);
     });
   }
 }

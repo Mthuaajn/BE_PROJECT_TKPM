@@ -27,7 +27,65 @@ export const search = wrapRequestHandler(
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
       if (plugin != null) {
         const result = await plugin.search(search);
-        res.json(result);
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+export const detailStory = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const title: string = req.query.title?.toString() || '';
+    const source: string = req.query.datasource?.toString() || '';
+
+    console.log('source: ', source);
+    console.log('title: ', title);
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      if (plugin != null) {
+        const result = await plugin.detailStory(title);
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+export const contentStory = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const chap: string = req.query.chap?.toString() || '';
+    const title: string = req.query.title?.toString() || '';
+    const source: string = req.query.datasource?.toString() || '';
+
+    console.log('source: ', source);
+    console.log('title: ', title);
+    console.log('chap: ', chap);
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      if (plugin != null) {
+        const result = await plugin.contentStory(title, chap);
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
       } else {
         res.json({ success: false, message: 'plugin errors' });
       }

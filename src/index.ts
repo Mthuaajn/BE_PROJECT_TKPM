@@ -13,8 +13,8 @@ import { hostname } from 'os';
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('ts-node').register();
-require('./index.ts');
+// require('ts-node').register();
+// require('./index.ts');
 
 const port = 3000;
 const host = '127.0.0.1';//'10.0.2.2';////'localhost';
@@ -23,6 +23,7 @@ const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
 dataSourceFactory.loadPlugins();
 dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
+dataSourceManager.printAllPlugins();
 //dataSourceManager.runPlugins();
 // Usage example
 const directoryToWatch = path.join(__dirname, '/models/DataSourcePlugin');
@@ -38,6 +39,7 @@ fileWatcher.on('fileAdded', async (filename) => {
 
   await dataSourceFactory.loadPlugins();
   dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
+  dataSourceManager.printAllPlugins();
   //dataSourceManager.runPlugins();
 
   // dataSourceFactory.clearAllPlugins();
