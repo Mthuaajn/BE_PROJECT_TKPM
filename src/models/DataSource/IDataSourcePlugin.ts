@@ -1,7 +1,6 @@
 export interface IDataSourcePlugin {
   name: string;
 
-  
   clone(name: string): IDataSourcePlugin;
   getBaseUrl(): string;
 

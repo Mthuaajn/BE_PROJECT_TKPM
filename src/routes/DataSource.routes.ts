@@ -3,6 +3,6 @@ import { search, detailStory, contentStory } from '~/controllers/DataSource.cont
 const dataSourceRouter = Router();
 
 dataSourceRouter.get('/search/*', search);
-dataSourceRouter.get('/detailStory/*',  detailStory);
+dataSourceRouter.get('/detailStory/*', detailStory);
 dataSourceRouter.get('/contentStory/*', contentStory);
 export default dataSourceRouter;
