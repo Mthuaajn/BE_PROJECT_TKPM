@@ -144,10 +144,11 @@ export default class Truyen123 implements IDataSourcePlugin {
         const description = $('.wrapper').find('.desc-text').text().trim(); //.find('br').text();
         const detail = $('.wrapper').find('.info .label').text();
         const host = this.getBaseUrl();
-
+        const link = searchString;
         const data: object = {
           name,
           title,
+          link,
           cover,
           author,
           authorLink,
