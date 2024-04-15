@@ -8,6 +8,7 @@ import fs from 'fs';
 // });
 //const fileUtils = require('../../utils/FileUtility');
 import { getFileNamesInFolder, removeFileExtension } from '../../utils/FileUtility';
+import { contentStory } from '~/controllers/DataSource.controllers';
 
 const dataSourcePluginFolder = path.join(__dirname, '../DataSourcePlugin/'); //"/models/DataSourcePlugin/";//
 export class DataSourceFactory {
@@ -43,8 +44,8 @@ export class DataSourceFactory {
       const fileNames: string[] = getFileNamesInFolder(dataSourcePluginFolder);
       for (const name of fileNames) {
         console.log('load plugin name: ', name);
-        const plugin: IDataSourcePlugin =  this.loadPluginFromFileName(name);
-         this.registerDataSourcePlugin(name, plugin);
+        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name);
+        this.registerDataSourcePlugin(removeFileExtension(name), plugin);
       }
     } catch (error) {
       console.log(error);
@@ -53,7 +54,7 @@ export class DataSourceFactory {
 
   // public async loadPlugins(): Promise<void> {
   //   const fileNames = fs.readdirSync(dataSourcePluginFolder);
-    
+
   //   for (const fileName of fileNames) {
   //     if (path.extname(fileName) === '.ts') {
   //       //console.log("fileName: ",fileName);
@@ -65,15 +66,14 @@ export class DataSourceFactory {
   //       //const modulePath = './' + filePath;//replace(/\\/g, '/');
   //       //console.log("modulePath:" ,modulePath);
 
-       
   //       const modulePath = `file://${path.resolve(filePath)}`;
   //      // const { default: DefaultClass } = await ts.require(modulePath);
-    
+
   //      // const modulePath = path.resolve(filePath);
   //     // eslint-disable-next-line @typescript-eslint/no-var-requires
   //     //const importedModule = require(modulePath);
   //     const DefaultClass = importedModule.default;
-      
+
   //       // const DefaultClass = await import(
   //       //   'D:\\Uni Project\\TestTypeScript\\BE_PROJECT_TKPM\\src\\models\\DataSourcePlugin\\Truyen123Plugin'
   //       // );
@@ -93,19 +93,25 @@ export class DataSourceFactory {
     });
   }
 
-  private  loadPluginFromFileName(pluginName: string): IDataSourcePlugin {
+  private loadPluginFromFileName(pluginName: string): IDataSourcePlugin {
     const pluginFilePath = `file://${path.join(dataSourcePluginFolder, pluginName)}`;
 
     const pluginFile = path.join(dataSourcePluginFolder, pluginName);
     //console.log('pluginFile: ', path.join(dataSourcePluginFolder, removeFileExtension(pluginName)));
 
+    const moduleName = removeFileExtension(pluginName);
+    //console.log('module: ', moduleName);
     if (fs.existsSync(pluginFile)) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const PluginClass = require(pluginFile).default;
+      //const  PluginClass = require(pluginFile).default;
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const {plugin: PluginClass} = require(pluginFile);
+      //console.log("PluginClass: ",PluginClass);
       // const importedModule = await import(pluginFilePath);
       // console.log(importedModule);
       //const PluginClass = importedModule.default;
-      return new PluginClass(pluginName);
+      //return new PluginClass(pluginName);
+      return new PluginClass(moduleName);
     }
     throw new Error(`Plugin not found: ${pluginName}`);
   }

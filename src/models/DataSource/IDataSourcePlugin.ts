@@ -7,4 +7,8 @@ export interface IDataSourcePlugin {
   search(title: string, page?: string): any;
   detailStory(title: string): any;
   contentStory(title: string, chap?: string): any;
+  newestStory(limiter?: number, page?: string): any;
+  fullStory(limiter?: number, page?: string): any;
+  hotStory(limiter?: number, page?: string): any;
+  home(): any;
 }

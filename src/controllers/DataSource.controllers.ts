@@ -24,7 +24,8 @@ export const search = wrapRequestHandler(
 
     if (source != null) {
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
-      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      //const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         const result = await plugin.search(search);
         if (result != null) {
@@ -50,7 +51,7 @@ export const detailStory = wrapRequestHandler(
 
     if (source != null) {
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
-      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         const result = await plugin.detailStory(title);
         if (result != null) {
@@ -78,9 +79,70 @@ export const contentStory = wrapRequestHandler(
 
     if (source != null) {
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
-      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin.ts`);
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         const result = await plugin.contentStory(title, chap);
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+export const listStory = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const type: string = req.query.type?.toString() || '';
+    const page: string = req.query.page?.toString() || '';
+    const source: string = req.query.datasource?.toString() || '';
+
+    console.log('source: ', source);
+    console.log('page: ', page);
+    console.log('type: ', type);
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
+      if (plugin != null) {
+        let result = null;
+        if (type == 'newest') {
+          result = await plugin.newestStory(undefined, page);
+        } else if (type == 'full') {
+          result = await plugin.fullStory(undefined, page);
+        } else if (type == 'hot') {
+          result = await plugin.hotStory(undefined, page);
+        } else {
+          res.json({ success: false, message: 'invalid type of list story' });
+        }
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+export const home = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const source: string = req.query.datasource?.toString() || '';
+
+    console.log('source: ', source);
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
+      if (plugin != null) {
+        const result = await plugin.home();
         if (result != null) {
           res.json(result);
         } else {
