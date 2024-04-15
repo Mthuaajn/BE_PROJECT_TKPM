@@ -105,7 +105,7 @@ export class DataSourceFactory {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       //const  PluginClass = require(pluginFile).default;
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const {plugin: PluginClass} = require(pluginFile);
+      const { plugin: PluginClass } = require(pluginFile);
       //console.log("PluginClass: ",PluginClass);
       // const importedModule = await import(pluginFilePath);
       // console.log(importedModule);

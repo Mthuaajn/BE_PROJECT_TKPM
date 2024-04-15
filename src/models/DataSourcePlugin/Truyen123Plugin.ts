@@ -446,5 +446,5 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   }
 }
 module.exports = {
-  plugin: Truyen123Plugin,
-}
+  plugin: Truyen123Plugin
+};
