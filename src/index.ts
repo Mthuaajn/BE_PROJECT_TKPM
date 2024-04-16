@@ -10,7 +10,7 @@ import { FileWatcher } from './models/FileWatcher';
 import { hostname } from 'os';
 
 const port = 3000;
-const host = '127.0.0.1';//'10.0.2.2';////'localhost';
+const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();
 const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
@@ -20,7 +20,7 @@ dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
 // Usage example
 const directoryToWatch = path.join(__dirname, '/models/DataSourcePlugin');
 const fileWatcher = new FileWatcher(directoryToWatch);
-fileWatcher.startWatching();
+fileWatcher.startWatching(); // lỗi ở đây
 
 // Event listener for 'fileAdded' event
 fileWatcher.on('fileAdded', (filename) => {
@@ -41,10 +41,10 @@ fileWatcher.on('fileAdded', (filename) => {
 //DatabaseService.run().catch(console.dir);
 app.use(express.json());
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/',dataSourceRouter);
+app.use('/api/v1/', dataSourceRouter);
 //import { search } from './controllers/DataSource.controllers';
 //app.get('/api/v1/search/DataSource/Voz/title', search);
 app.use('*', defaultErrorHandlers);
-app.listen(port,host, () => {
+app.listen(port, host, () => {
   console.log(`app running on port http://${host}:${port}/`);
 });
