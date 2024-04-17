@@ -34,11 +34,11 @@ export class DataSourceFactory {
     return this.dataSourceMap;
   }
 
-  public loadPlugins(): void {
+  public async loadPlugins(): Promise<void> {
     const fileNames: string[] = getFileNamesInFolder(dataSourcePluginFolder);
     for (const name of fileNames) {
       console.log('load plugin name: ', name);
-      const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name);
+      const plugin: IDataSourcePlugin = await this.loadPluginFromFileName(name);
       this.registerDataSourcePlugin(name, plugin);
     }
   }
@@ -54,22 +54,22 @@ export class DataSourceFactory {
     });
   }
 
-  private loadPluginFromFileName(pluginName: string): IDataSourcePlugin {
+  private async loadPluginFromFileName(pluginName: string): Promise<IDataSourcePlugin> {
     const pluginFile = path.join(dataSourcePluginFolder, pluginName);
 
     if (fs.existsSync(pluginFile)) {
-      const PluginClass = require(pluginFile).default;
+      const { default: PluginClass } = await import(pluginFile);
       return new PluginClass(pluginName);
     }
     throw new Error(`Plugin not found: ${pluginName}`);
   }
 
-  private loadPluginFromPath(pluginPath: string): IDataSourcePlugin {
+  private async loadPluginFromPath(pluginPath: string): Promise<IDataSourcePlugin> {
     const pluginName = path.basename(pluginPath);
     const pluginFile = path.join(pluginPath, `${pluginName}.ts`);
 
     if (fs.existsSync(pluginFile)) {
-      const PluginClass = require(pluginFile).default;
+      const { default: PluginClass } = await import(pluginFile);
       return new PluginClass(pluginName);
     }
 
