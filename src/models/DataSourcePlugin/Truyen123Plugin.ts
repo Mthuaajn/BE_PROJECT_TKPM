@@ -48,6 +48,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           description: string | undefined;
           host: string | undefined;
           author: string | undefined;
+          authorLink: string | undefined;
           view: string | undefined;
           categoryList: any[] | undefined;
         }[] = [];
@@ -78,12 +79,14 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             })
             .text()
             .trim();
+          const authorUrl = $(element).find('.col-author a').attr('href');
+          const authorLink = authorUrl?.split('/').pop();
           const view = $(element).find('.col-view.show-view').text().trim();
           const categoryList = $(element)
             .find('.col-category a')
             .map((_, childElement) => {
               const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href');
+              const href = $(childElement).attr('href')?.split('/').pop();
               return { content, href };
             })
             .get();
@@ -95,6 +98,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             description,
             host: this.getBaseUrl(),
             author,
+            authorLink,
             //   view: undefined,
             //   categoryList: undefined,
             view,
@@ -134,7 +138,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           .find('a[itemprop="genre"]')
           .map((_, childElement) => {
             const content = $(childElement).text().trim();
-            const href = $(childElement).attr('href');
+            const href = $(childElement).attr('href')?.split('/').pop();
             return { content, href };
           })
           .get();
@@ -224,6 +228,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           description: string | undefined;
           host: string | undefined;
           author: string | undefined;
+          authorLink: string | undefined;
           view: string | undefined;
           categoryList: any[] | undefined;
         }[] = [];
@@ -248,12 +253,14 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             })
             .text()
             .trim();
+          const authorUrl = $(element).find('.col-author a').attr('href');
+          const authorLink = authorUrl?.split('/').pop();
           const view = $(element).find('.col-view.show-view').text().trim();
           const categoryList = $(element)
             .find('.col-category a')
             .map((_, childElement) => {
               const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href');
+              const href = $(childElement).attr('href')?.split('/').pop();
               return { content, href };
             })
             .get();
@@ -265,6 +272,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             description,
             host: this.getBaseUrl(),
             author,
+            authorLink,
             //   view: undefined,
             //   categoryList: undefined,
             view,
@@ -298,6 +306,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           description: string | undefined;
           host: string | undefined;
           author: string | undefined;
+          authorLink: string | undefined;
           view: string | undefined;
           categoryList: any[] | undefined;
         }[] = [];
@@ -322,12 +331,14 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             })
             .text()
             .trim();
+          const authorUrl = $(element).find('.col-author a').attr('href');
+          const authorLink = authorUrl?.split('/').pop();
           const view = $(element).find('.col-view.show-view').text().trim();
           const categoryList = $(element)
             .find('.col-category a')
             .map((_, childElement) => {
               const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href');
+              const href = $(childElement).attr('href')?.split('/').pop();
               return { content, href };
             })
             .get();
@@ -339,6 +350,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             description,
             host: this.getBaseUrl(),
             author,
+            authorLink,
             //   view: undefined,
             //   categoryList: undefined,
             view,
@@ -372,6 +384,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           description: string | undefined;
           host: string | undefined;
           author: string | undefined;
+          authorLink: string | undefined;
           view: string | undefined;
           categoryList: any[] | undefined;
         }[] = [];
@@ -396,12 +409,14 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             })
             .text()
             .trim();
+          const authorUrl = $(element).find('.col-author a').attr('href');
+          const authorLink = authorUrl?.split('/').pop();
           const view = $(element).find('.col-view.show-view').text().trim();
           const categoryList = $(element)
             .find('.col-category a')
             .map((_, childElement) => {
               const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href');
+              const href = $(childElement).attr('href')?.split('/').pop();
               return { content, href };
             })
             .get();
@@ -413,6 +428,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             description,
             host: this.getBaseUrl(),
             author,
+            authorLink,
             //   view: undefined,
             //   categoryList: undefined,
             view,
@@ -444,6 +460,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
+
+  public async categoryList(): Promise<any> {}
 }
 module.exports = {
   plugin: Truyen123Plugin

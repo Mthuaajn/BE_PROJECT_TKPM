@@ -90,4 +90,14 @@ export class DataSourceManager {
       console.log(`Running plugin ${key} ...`);
     });
   }
+
+  public getAllPluginName(): string[] {
+    const list: string[] = [];
+    this.dataSourcePlugin.forEach((value, key) => {
+      const str: string = key.replace(/plugin/g, '');
+      list.push(str);
+    });
+
+    return list;
+  }
 }

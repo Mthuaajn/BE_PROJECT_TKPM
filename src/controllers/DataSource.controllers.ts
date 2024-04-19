@@ -156,3 +156,15 @@ export const home = wrapRequestHandler(
     }
   }
 );
+
+export const listDataSource = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+    const nameDataSource: string[] = dataSourceManager.getAllPluginName();
+    const data: object = {
+      length: nameDataSource.length,
+      names: nameDataSource
+    };
+    res.json(data);
+  }
+);

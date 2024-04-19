@@ -17,7 +17,7 @@ import { hostname } from 'os';
 // require('./index.ts');
 
 const port = 3000;
-const host = '127.0.0.1';//'10.0.2.2';////'localhost';
+const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();
 const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
@@ -50,10 +50,13 @@ fileWatcher.on('fileAdded', async (filename) => {
 //DatabaseService.run().catch(console.dir);
 app.use(express.json());
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/',dataSourceRouter);
+app.use('/api/v1/', dataSourceRouter);
+app.use('/', (req, res) => {
+  res.json({ msg: 'oke' });
+});
 //import { search } from './controllers/DataSource.controllers';
 //app.get('/api/v1/search/DataSource/Voz/title', search);
 app.use('*', defaultErrorHandlers);
-app.listen(port,host, () => {
+app.listen(port, host, () => {
   console.log(`app running on port http://${host}:${port}/`);
 });
