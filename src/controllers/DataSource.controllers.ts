@@ -132,6 +132,7 @@ export const listStory = wrapRequestHandler(
     }
   }
 );
+
 export const home = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const source: string = req.query.datasource?.toString() || '';
@@ -166,5 +167,56 @@ export const listDataSource = wrapRequestHandler(
       names: nameDataSource
     };
     res.json(data);
+  }
+);
+
+export const listCategory = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const source: string = req.query.datasource?.toString() || '';
+
+    console.log('source: ', source);
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
+      if (plugin != null) {
+        const result = await plugin.categoryList();
+
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+
+export const listChapter = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const source: string = req.query.datasource?.toString() || '';
+    const title: string = req.query.title?.toString() || '';
+    const page: string = req.query.page?.toString() || '';
+
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
+      if (plugin != null) {
+        const result = await plugin.chapterList(title, page);
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
   }
 );
