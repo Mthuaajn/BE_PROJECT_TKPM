@@ -172,7 +172,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           host,
           maxChapter,
           listChapter,
-          currentPage: page,
+          currentPage: this.getNumberValueFromString(page),
           maxPage
         };
 

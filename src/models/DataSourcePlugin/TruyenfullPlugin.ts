@@ -221,7 +221,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           host,
           maxChapter,
           listChapter,
-          currentPage: page,
+          currentPage:  this.getNumberValueFromString(page),
           maxPage
         };
 
@@ -233,6 +233,20 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       return null;
     }
   }
+
+  private getNumberValueFromString(input: string): number {
+    const numberPattern = /\d+/; // Regular expression to match one or more digits
+
+    const match = input.match(numberPattern);
+    if (match) {
+      const integerValue = parseInt(match[0], 10);
+      return integerValue;
+    } else {
+      //console.log('No integer value found');
+      return -1;
+    }
+  }
+  
   public async detailStory(title: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
     try {
