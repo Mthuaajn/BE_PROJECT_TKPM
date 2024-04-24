@@ -37,7 +37,7 @@ export const downloadChapter = wrapRequestHandler(
 
           if (fileExtensionPlugin != null) {
             const filePath = await fileExtensionPlugin.createFile(title, chap, result.content); //const fileName =
-            console.log("filePath: ",filePath);
+            console.log('filePath: ', filePath);
             res.download(filePath, filePath, (err) => {
               if (err) {
                 console.error('Error sending file:', err);
@@ -48,7 +48,7 @@ export const downloadChapter = wrapRequestHandler(
             /* res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename=${requestedFile}`);
      res.send(file);*/
-     /*const files = [
+            /*const files = [
     { path: './file1.docx', name: 'file1.docx' },
     { path: './file2.pdf', name: 'file2.pdf' }
     // Add more files as needed

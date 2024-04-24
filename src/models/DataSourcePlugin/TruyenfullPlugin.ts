@@ -353,7 +353,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         }[] = [];
 
         dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length > limiter) {
+          if (data.length >= limiter) {
             return;
           }
           const name = element?.title;
@@ -421,7 +421,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         }[] = [];
 
         dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length > limiter) {
+          if (data.length >= limiter) {
             return;
           }
           const name = element?.title;
@@ -489,7 +489,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         }[] = [];
 
         dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length > limiter) {
+          if (data.length >= limiter) {
             return;
           }
           const name = element?.title;
@@ -530,9 +530,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   }
   public async home(): Promise<any> {
     try {
-      const hot = await this.hotStory(10, '1');
-      const full = await this.fullStory(10, '1');
-      const newest = await this.newestStory(10, '1');
+      const hot = await this.hotStory(12, '1');
+      const full = await this.fullStory(12, '1');
+      const newest = await this.newestStory(12, '1');
 
       const data: object = {
         hot,

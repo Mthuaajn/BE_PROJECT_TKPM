@@ -1,7 +1,7 @@
 import { error } from 'console';
 import { IFileExtensionPlugin } from '../FileExtension/IFileExtensionPlugin';
 import * as fs from 'fs';
-import  Docxtemplater from 'docxtemplater';
+import Docxtemplater from 'docxtemplater';
 
 export class DOCPlugin implements IFileExtensionPlugin {
   public constructor() {}

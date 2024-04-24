@@ -603,9 +603,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   }
   public async home(): Promise<any> {
     try {
-      const hot = await this.hotStory(10, '1');
-      const full = await this.fullStory(10, '1');
-      const newest = await this.newestStory(10, '1');
+      const hot = await this.hotStory(12, '1');
+      const full = await this.fullStory(12, '1');
+      const newest = await this.newestStory(12, '1');
 
       const data: object = {
         hot,
