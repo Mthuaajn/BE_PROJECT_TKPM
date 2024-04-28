@@ -94,8 +94,8 @@ export class DataSourceManager {
   public getAllPluginName(): string[] {
     const list: string[] = [];
     this.dataSourcePlugin.forEach((value, key) => {
-      console.log("value: ",value.name);
-      console.log("key: ",key);
+      // console.log("value: ",value.name);
+      // console.log("key: ",key);
       const str: string = value.name.replace(/Plugin/g, '');
       list.push(str);
     });
