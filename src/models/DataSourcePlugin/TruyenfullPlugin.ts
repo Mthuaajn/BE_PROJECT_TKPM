@@ -209,10 +209,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const host = this.getBaseUrl();
         const maxChapter: number = json.meta.pagination.total;
         const maxPage: number = json.meta.pagination.total_pages;
-        const listChapter: { content: string; href: number }[] = [];
+        const listChapter: { content: string; href: string }[] = [];
         dataResponse.forEach((value, index) => {
           const content = value.title;
-          const href = value.id;
+          const href = value.id.toString();
           listChapter.push({ content, href });
         });
 
@@ -221,7 +221,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           host,
           maxChapter,
           listChapter,
-          currentPage:  this.getNumberValueFromString(page),
+          currentPage: this.getNumberValueFromString(page),
           maxPage
         };
 
@@ -246,7 +246,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       return -1;
     }
   }
-  
+
   public async detailStory(title: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
     try {
@@ -304,10 +304,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const json = await response.json();
         const dataResponse: ContentStoryItemTruyenfull = json.data;
         const name = dataResponse.story_name;
-        const title = dataResponse.story_id;
+        const title = dataResponse.story_id.toString();
         const chapterTitle = dataResponse.chapter_name;
         const host = this.getBaseUrl();
-        const content = dataResponse.content;
+        const content = dataResponse.content.replace(/<br\/>|<i>|<\/i>/g, '');
         const data: object = {
           name,
           title,
