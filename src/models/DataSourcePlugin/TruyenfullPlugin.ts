@@ -132,7 +132,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         dataArr.forEach((element: ItemTruyenfull) => {
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id;
+          const title = element?.id.toString();
           const cover = element.image;
           const description = 'no information';
           const host = this.getBaseUrl();
@@ -170,11 +170,11 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     const categories = category.split(','); // Split categories by comma
     const categoryIds = category_ids.split(','); // Split category_ids by comma
 
-    const result: { content: string; href: number }[] = [];
+    const result: { content: string; href: string }[] = [];
 
     for (let i = 0; i < categories.length; i++) {
       const content: string = categories[i].trim(); // Remove whitespace around category
-      const href: number = parseInt(categoryIds[i].trim()); // Convert category_id to number
+      const href: string = categoryIds[i].trim(); // Convert category_id to number
 
       result.push({ content, href });
     }
@@ -259,7 +259,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const dataResponse: DetailStoryItemTruyenfull = json.data;
 
         const name = dataResponse.title;
-        const title = dataResponse.id;
+        const title = dataResponse.id.toString();
         const link = dataResponse.link;
         const cover = dataResponse.image;
         const author = dataResponse.author;
@@ -358,7 +358,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           }
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id;
+          const title = element?.id.toString();
 
           const cover = element.image;
           const description = 'no information';
@@ -426,7 +426,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           }
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id;
+          const title = element?.id.toString();
 
           const cover = element.image;
           const description = 'no information';
@@ -494,7 +494,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           }
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id;
+          const title = element?.id.toString();
 
           const cover = element.image;
           const description = 'no information';
@@ -503,7 +503,6 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           const authorLink = this.convertToUnicodeAndCreateURL(element.author);
           const view = 'no information';
           const categoryList = this.processCategoryList(element.categories, element.category_ids);
-
           data.push({
             name,
             link,
