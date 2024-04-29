@@ -11,19 +11,21 @@ export class EPUBPlugin implements IFileExtensionPlugin {
   public async createFile(title: string, chapter: string, content: string): Promise<any> {
     const filePath = `downloadedFile/${title}_${chapter}.epub`;
     const options = {
-      title: title,
+      title: `Book id ${title}`,
       author: 'unknown author',
       content: [
         {
           data: content,
           beforeToc: true,
           fileName: `${title}_${chapter}.html`,
-          title: chapter
+          title: `Chapter ${chapter}`
         }
       ]
     };
     try {
-      await new EPub(options, filePath);
+      const epub = await new EPub(options, filePath);
+
+      
       return filePath;
     } catch (err) {
       console.log('Error writing file:', err);

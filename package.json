@@ -20,6 +20,7 @@
     "@types/epub-gen": "^0.1.2",
     "@types/esm": "^3.2.2",
     "@types/express": "^4.17.21",
+    "@types/got": "^9.6.12",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -37,6 +38,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.5.0",
     "@types/jsonwebtoken": "^9.0.6",
     "cheerio": "^1.0.0-rc.12",
     "docxtemplater": "^3.47.1",
@@ -44,7 +46,8 @@
     "epub-gen": "^0.1.0",
     "esm": "^3.2.25",
     "express-validator": "^7.0.1",
-    "fetch": "^1.1.0",
+    "got": "^14.2.1",
+    "json": "^11.0.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.4.0"
