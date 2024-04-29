@@ -39,11 +39,12 @@
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.6",
     "cheerio": "^1.0.0-rc.12",
-    "docxtemplater": "^3.47.0",
+    "docxtemplater": "^3.47.1",
     "dotenv": "^16.4.5",
     "epub-gen": "^0.1.0",
     "esm": "^3.2.25",
     "express-validator": "^7.0.1",
+    "fetch": "^1.1.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.4.0"
