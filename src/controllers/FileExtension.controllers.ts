@@ -37,14 +37,21 @@ export const downloadChapter = wrapRequestHandler(
 
           if (fileExtensionPlugin != null) {
             const filePath = await fileExtensionPlugin.createFile(title, chap, result.content); //const fileName =
-            console.log('filePath: ', filePath);
-            res.download(filePath, filePath, (err) => {
-              if (err) {
-                console.error('Error sending file:', err);
-              } else {
-                console.log('File sent successfully.');
-              }
-            });
+            if (filePath) {
+              console.log('filePath: ', filePath);
+              res.download(filePath, filePath, (err) => {
+                if (err) {
+                  console.error('Error sending file:', err);
+                } else {
+                  console.log('File sent successfully.');
+                }
+              });
+            } else {
+              console.error('Error creating file.');
+              res.sendStatus(500);
+             // res.json({msg: "error"})
+            }
+           
             /* res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename=${requestedFile}`);
      res.send(file);*/

@@ -74,7 +74,7 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
 app.use('/', (req, res) => {
-  res.json({ msg: 'oke' });
+  res.json({ msg: 'You have accessed to this server successfully!' });
 });
 //import { search } from './controllers/DataSource.controllers';
 //app.get('/api/v1/search/DataSource/Voz/title', search);

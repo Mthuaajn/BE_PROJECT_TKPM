@@ -110,11 +110,11 @@ export const listStory = wrapRequestHandler(
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         let result = null;
-        if (type == 'newest') {
+        if (type === 'newest') {
           result = await plugin.newestStory(undefined, page);
-        } else if (type == 'full') {
+        } else if (type === 'full') {
           result = await plugin.fullStory(undefined, page);
-        } else if (type == 'hot') {
+        } else if (type === 'hot') {
           result = await plugin.hotStory(undefined, page);
         } else {
           res.json({ success: false, message: 'invalid type of list story' });
