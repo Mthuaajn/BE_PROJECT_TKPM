@@ -17,7 +17,7 @@ import { FileExtensionManager } from './models/FileExtension/FileExtensionManage
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // require('ts-node').register();
 // require('./index.ts');
-
+import axios from 'axios';
 const port = 3000;
 const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();
@@ -73,7 +73,7 @@ app.use(express.json());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
-app.use('/', (req, res) => {
+app.use('/', async (req, res) => {
   res.json({ msg: 'You have accessed to this server successfully!' });
 });
 //import { search } from './controllers/DataSource.controllers';
