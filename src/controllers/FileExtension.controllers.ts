@@ -49,9 +49,9 @@ export const downloadChapter = wrapRequestHandler(
             } else {
               console.error('Error creating file.');
               res.sendStatus(500);
-             // res.json({msg: "error"})
+              // res.json({msg: "error"})
             }
-           
+
             /* res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename=${requestedFile}`);
      res.send(file);*/
