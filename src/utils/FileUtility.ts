@@ -17,6 +17,12 @@ export function removeFileExtension(fileName: string): string {
   }
   return fileName;
 }
+
+export function getFileExtension(fileName: string): string {
+  const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+  return fileExtension;
+}
+
 // module.exports = {
 //     getFileNamesInFolder: getFileNamesInFolder,
 // }
