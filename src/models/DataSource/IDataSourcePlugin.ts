@@ -13,4 +13,7 @@ export interface IDataSourcePlugin {
   categoryList(type?: string): any;
   chapterList(title: string, page?: string): any;
   home(): any;
+  newestStoryAtCategory(category: string, limiter?: number, page?: string): any;
+  fullStoryAtCategory(category: string, limiter?: number, page?: string): any;
+  hotStoryAtCategory(category: string, limiter?: number, page?: string): any;
 }

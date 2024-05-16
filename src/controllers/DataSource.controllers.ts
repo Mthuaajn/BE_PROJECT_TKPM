@@ -220,3 +220,41 @@ export const listChapter = wrapRequestHandler(
     }
   }
 );
+
+export const ListStoryAtCategory = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const type: string = req.query.type?.toString() || '';
+    const page: string = req.query.page?.toString() || '';
+    const source: string = req.query.datasource?.toString() || '';
+    const category: string = req.query.category?.toString() || '';
+    console.log('source: ', source);
+    console.log('page: ', page);
+    console.log('type: ', type);
+    console.log('category', category);
+    if (source != null) {
+      const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
+      const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
+      if (plugin != null) {
+        let result = null;
+        if (type === 'newest') {
+          result = await plugin.newestStoryAtCategory(category, undefined, page);
+        } else if (type === 'full') {
+          result = await plugin.fullStoryAtCategory(category, undefined, page);
+        } else if (type === 'hot') {
+          result = await plugin.hotStoryAtCategory(category, undefined, page);
+        } else {
+          res.json({ success: false, message: 'invalid type of list story' });
+        }
+        if (result != null) {
+          res.json(result);
+        } else {
+          res.json({ quantity: 0 });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);

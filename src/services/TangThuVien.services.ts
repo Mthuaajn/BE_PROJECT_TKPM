@@ -139,6 +139,10 @@ class TangThuVienServices {
     };
     return result;
   };
+  getNewestStoryAtCategory = (html: string, limiter?: number) => {
+    const result = this.getStory(html, limiter);
+    return result;
+  };
 }
 
 const tangThuVienServices = new TangThuVienServices();

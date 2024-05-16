@@ -592,6 +592,24 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       return null;
     }
   }
+
+  public async newestStoryAtCategory(
+    category: string,
+    limiter?: number,
+    page?: string
+  ): Promise<any> {}
+
+  public async fullStoryAtCategory(
+    category: string,
+    limiter?: number,
+    page?: string
+  ): Promise<any> {}
+
+  public async hotStoryAtCategory(
+    category: string,
+    limiter?: number,
+    page?: string
+  ): Promise<any> {}
 }
 module.exports = {
   plugin: TruyenfullPlugin

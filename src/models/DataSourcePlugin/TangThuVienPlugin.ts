@@ -162,6 +162,60 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     }
     return result;
   }
+  private async getCtg(category: string): Promise<number> {
+    const listCategory = await this.categoryList();
+    let ctg: number = 0;
+    listCategory.forEach((element: any, index: number) => {
+      if (element.content === category) {
+        ctg = index + 1;
+        return;
+      }
+    });
+    return ctg;
+  }
+  private async getStoryWithSearchString(searchString: string): Promise<any> {
+    let result: Story[] = [];
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET'
+      });
+      const html = await response.text();
+      result = tangThuVienServices.getStory(html);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return result;
+  }
+
+  public async newestStoryAtCategory(
+    category: string,
+    limiter?: number,
+    page?: string
+  ): Promise<any> {
+    const ctg: string = (await this.getCtg(category)).toString();
+    const searchString: string = `${this.getBaseUrl()}/tong-hop?ord=new&ctg=${ctg}&page=${page}`;
+    const result: any = await this.getStoryWithSearchString(searchString);
+    return result;
+  }
+
+  public async fullStoryAtCategory(
+    category: string,
+    limiter?: number,
+    page?: string
+  ): Promise<any> {
+    const ctg: string = (await this.getCtg(category)).toString();
+    const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=nm&ctg=${ctg}&page=${page}`;
+    const result: any = await this.getStoryWithSearchString(searchString);
+    return result;
+  }
+
+  public async hotStoryAtCategory(category: string, limiter?: number, page?: string): Promise<any> {
+    const ctg: string = (await this.getCtg(category)).toString();
+    const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=vw&ctg=${ctg}&page=${page}`;
+    const result: any = await this.getStoryWithSearchString(searchString);
+    return result;
+  }
 }
 module.exports = {
   plugin: TangThuVienPlugin

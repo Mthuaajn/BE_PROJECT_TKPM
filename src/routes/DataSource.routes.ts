@@ -1,3 +1,4 @@
+import { ListStoryAtCategory } from './../controllers/DataSource.controllers';
 import { Router } from 'express';
 import {
   search,
@@ -19,4 +20,5 @@ dataSourceRouter.get('/home/*', home);
 dataSourceRouter.get('/listDataSource/*', listDataSource);
 dataSourceRouter.get('/listCategory/*', listCategory);
 dataSourceRouter.get('/listChapter/*', listChapter);
+dataSourceRouter.get('/listStoryAtCategory/*', ListStoryAtCategory);
 export default dataSourceRouter;
