@@ -597,19 +597,94 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     category: string,
     limiter?: number,
     page?: string
-  ): Promise<any> {}
+  ): Promise<any> {
+    let data;
+    const cate = category
+      .split(' ')
+      .join('-')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(' ')
+      .join('-')
+      .toLowerCase();
+    const searchString = `${this.getBaseUrl()}/v1/story/cate?cate=${cate}&type=story_new&page=${page}`;
+    ``;
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      const res = await response.json();
+      data = res.data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return data;
+  }
 
   public async fullStoryAtCategory(
     category: string,
     limiter?: number,
     page?: string
-  ): Promise<any> {}
+  ): Promise<any> {
+    let data;
+    const cate = category
+      .split(' ')
+      .join('-')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(' ')
+      .join('-')
+      .toLowerCase();
+    const searchString = `${this.getBaseUrl()}/v1/story/cate?cate=${cate}&type=story_full&page=${page}`;
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      const res = await response.json();
+      data = res.data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return data;
+  }
 
-  public async hotStoryAtCategory(
-    category: string,
-    limiter?: number,
-    page?: string
-  ): Promise<any> {}
+  public async hotStoryAtCategory(category: string, limiter?: number, page?: string): Promise<any> {
+    let data;
+    const cate = category
+      .split(' ')
+      .join('-')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(' ')
+      .join('-')
+      .toLowerCase();
+    const searchString = `${this.getBaseUrl()}/v1/story/cate?cate=${cate}&type=story_view&page=${page}`;
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      const res = await response.json();
+      data = res.data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return data;
+  }
 }
 module.exports = {
   plugin: TruyenfullPlugin
