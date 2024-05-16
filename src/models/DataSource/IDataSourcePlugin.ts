@@ -10,7 +10,7 @@ export interface IDataSourcePlugin {
   newestStory(limiter?: number, page?: string): any;
   fullStory(limiter?: number, page?: string): any;
   hotStory(limiter?: number, page?: string): any;
-  categoryList(): any;
+  categoryList(type?: string): any;
   chapterList(title: string, page?: string): any;
   home(): any;
 }

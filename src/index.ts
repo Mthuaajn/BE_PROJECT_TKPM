@@ -1,7 +1,5 @@
 import { defaultErrorHandlers } from './middlewares/error.middlewares';
 import express from 'express';
-import DatabaseService from '~/services/db.services';
-import userRouter from '~/routes/users.routes';
 import dataSourceRouter from './routes/DataSource.routes';
 import { DataSourceFactory } from './models/DataSource/DataSourceFactory';
 import { DataSourceManager } from './models/DataSource/DataSourceManager';
@@ -70,7 +68,7 @@ fileWatcherForFileExtensionPlugin.on('fileAdded', async (filename) => {
 });
 //DatabaseService.run().catch(console.dir);
 app.use(express.json());
-app.use('/api/v1/users', userRouter);
+
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
 app.use('/', async (req, res) => {

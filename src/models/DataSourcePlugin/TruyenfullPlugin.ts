@@ -199,7 +199,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
       if (response.ok) {

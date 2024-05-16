@@ -173,14 +173,14 @@ export const listDataSource = wrapRequestHandler(
 export const listCategory = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const source: string = req.query.datasource?.toString() || '';
-
+    const type: string = req.query.type?.toString() || '';
     console.log('source: ', source);
-
+    console.log('type: ', type);
     if (source != null) {
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
-        const result = await plugin.categoryList();
+        const result = await plugin.categoryList(type);
 
         if (result != null) {
           res.json(result);

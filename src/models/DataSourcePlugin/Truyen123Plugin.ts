@@ -5,7 +5,7 @@ import { max } from 'lodash';
 
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
-  static baseUrl: string = 'https://123truyeni.com';
+  static baseUrl: string = 'https://123truyenii.com';
   public constructor(name: string) {
     this.name = name;
   }
@@ -273,8 +273,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         //   return text;
         // });
         //console.log("maxChapterDiv: ",maxChapterDiv);
-       
-       /* const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
+
+        /* const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
         const listChapter = $('.wrapper')
           .find('.list-chapter li a')
           .map((_, childElement) => {
