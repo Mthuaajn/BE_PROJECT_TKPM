@@ -102,7 +102,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     return new TruyenfullPlugin(name);
   }
 
-  public async search(title: string, page?: string): Promise<any> {
+  public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/v1/tim-kiem?title=${encodeURIComponent(title)}&page=${page}`;
     try {
@@ -110,7 +110,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/vnd.api+json'
+          'Content-Type': 'application/vnd.api+json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
       if (response.ok) {
@@ -156,6 +157,12 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
             categoryList
           });
         });
+        if (category) {
+          const categoryData = data.filter((value) => {
+            return value.categoryList?.some((item) => item.content === category);
+          });
+          return categoryData;
+        }
         return data;
 
         //return data;

@@ -1,3 +1,5 @@
+import { Category } from './../interface/TangThuVien.interface';
+import { listCategory } from './../../controllers/DataSource.controllers';
 import { url } from 'inspector';
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
@@ -17,7 +19,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
     return new Truyen123Plugin(name);
   }
 
-  public async search(title: string, page?: string): Promise<any> {
+  public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/search?q=${encodeURIComponent(title)}&page=${page}`;
     try {
@@ -106,7 +108,13 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             categoryList
           });
         });
-        //console.log(data)
+        if (category) {
+          const categoryData = data.filter((value) => {
+            return value.categoryList?.some((item) => item.content === category);
+          });
+
+          return categoryData;
+        }
         return data;
       }
     } catch (error) {
@@ -657,12 +665,35 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
-  
+
   public async newestStoryAtCategory(
     category: string,
     limiter?: number,
     page?: string
-  ): Promise<any> {}
+  ): Promise<any> {
+    const cate = category
+      .split(' ')
+      .join('-')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(' ')
+      .join('-')
+      .toLowerCase();
+    const searchString = `${this.getBaseUrl()}/the-loai/${category}?page=${page}`;
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET'
+      });
+      const html = await response.text();
+      const $ = cheerio.load(html);
+      const listCategory = await this.categoryList();
+      console.log(listCategory);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
 
   public async fullStoryAtCategory(
     category: string,

@@ -4,7 +4,7 @@ export interface IDataSourcePlugin {
   clone(name: string): IDataSourcePlugin;
   getBaseUrl(): string;
 
-  search(title: string, page?: string): any;
+  search(title: string, page?: string, category?: string): any;
   detailStory(title: string): any;
   contentStory(title: string, chap?: string): any;
   newestStory(limiter?: number, page?: string): any;

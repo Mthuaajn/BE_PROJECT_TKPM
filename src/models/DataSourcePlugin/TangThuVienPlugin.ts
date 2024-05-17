@@ -24,7 +24,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   }
   private getNumberValueFromString(input: string): any {}
   public async getMaxChapterPage(title: string): Promise<any> {}
-  public async search(title: string, page?: string): Promise<any> {
+  public async search(title: string, page?: string, category?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/ket-qua-tim-kiem?term=${title}&page=${page}`;
     let result: Story[] = [];
     try {
@@ -33,6 +33,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html);
+      if (category) {
+        result = result.filter((story) => story.category === category);
+      }
     } catch (err) {
       console.log(err);
       return null;
