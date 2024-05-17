@@ -29,7 +29,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: Story[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html);
@@ -47,7 +50,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: Story[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html, limiter as number);
@@ -62,7 +68,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: Story[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html, limiter as number);
@@ -77,7 +86,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: Story[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html, limiter as number);
@@ -92,7 +104,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     try {
       const searchString: string = `${this.getBaseUrl()}`;
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getCategoryList(html);
@@ -124,7 +139,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: ContentStory;
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getContentStory(html, chap as string);
@@ -139,7 +157,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     try {
       const searchString: string = `${this.getBaseUrl()}/doc-truyen/${title}`;
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       const url = this.getBaseUrl();
@@ -155,7 +176,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: DetailStory[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getDetailStory(html);
@@ -180,7 +204,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     let result: Story[] = [];
     try {
       const response = await fetch(searchString, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
       });
       const html = await response.text();
       result = tangThuVienServices.getStory(html);
