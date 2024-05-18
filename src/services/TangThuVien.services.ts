@@ -52,7 +52,12 @@ class TangThuVienServices {
       const description = $(element).find('.intro').text().trim();
       const author = $(element).find('.author a.name').text().trim();
       // method eq(1) lấy element thứ 2 xuất hiện
-      const category = $(element).find('.author a').eq(1).text().trim();
+      // const category = $(element).find('.author a').eq(1).text().trim();
+      const categoryElement = $(element).find('.author a').eq(1);
+      const category = {
+        content: categoryElement.text().trim(),
+        href: categoryElement.attr('href') || ''
+      } as never;
       const status = $(element).find('.author span').eq(0).text().trim();
       const update = $(element).find('.update span').text().trim();
       const totalChapter = parseInt($(element).find('.KIBoOgno').text().trim(), 10);
@@ -62,10 +67,15 @@ class TangThuVienServices {
         cover,
         description,
         author,
-        category,
+        categoryList: [].concat(category) as { content: string; href: string }[],
         status,
         update,
-        totalChapter
+        totalChapter,
+        link: 'no information',
+        title: 'no information',
+        host: 'https://truyen.tangthuvien.vn/',
+        authorLink: 'no information',
+        view: 'no information'
       };
       result.push(story);
     });

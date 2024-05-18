@@ -5,10 +5,18 @@ export interface Category {
 }
 export interface Story {
   name: string;
+  link: string;
+  title: string;
   cover: string;
   description: string;
   author: string;
-  category: string;
+  categoryList: {
+    content: string;
+    href: string;
+  }[];
+  host: string;
+  authorLink: string;
+  view: string;
   status: string;
   update: string;
   totalChapter: number;

@@ -37,7 +37,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       const html = await response.text();
       result = tangThuVienServices.getStory(html);
       if (category) {
-        result = result.filter((story) => story.category === category);
+        result = result.filter((story) =>
+          story.categoryList.filter((el) => el.content === category)
+        );
       }
     } catch (err) {
       console.log(err);
