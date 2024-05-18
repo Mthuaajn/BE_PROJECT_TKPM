@@ -23,6 +23,16 @@ export function getFileExtension(fileName: string): string {
   return fileExtension;
 }
 
+export function deleteFile(filePath: string): void {
+  fs.unlink(filePath, (error) => {
+    if (error) {
+      console.error('Error deleting file:', error);
+    } else {
+      console.log('File deleted successfully: ', filePath);
+    }
+  });
+}
+
 // module.exports = {
 //     getFileNamesInFolder: getFileNamesInFolder,
 // }

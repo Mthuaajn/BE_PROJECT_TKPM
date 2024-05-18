@@ -8,6 +8,7 @@ import { FileExtensionManager } from '~/models/FileExtension/FileExtensionManage
 import { IFileExtensionPlugin } from '~/models/FileExtension/IFileExtensionPlugin';
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
+import { deleteFile } from '~/utils/FileUtility';
 interface contentStoryAPI {
   name: string;
   title: string;
@@ -65,8 +66,9 @@ export const downloadChapter = wrapRequestHandler(
             });
 
             const zip = archiver('zip');
-
-            zip.pipe(res);
+            const output = fs.createWriteStream(zipFileName);
+            // zip.pipe(res);
+            zip.pipe(output);
 
             files.forEach((file) => {
               const fileStream = fs.createReadStream(file.path);
@@ -74,7 +76,23 @@ export const downloadChapter = wrapRequestHandler(
             });
 
             zip.finalize();
-          
+            output.on('close', () => {
+              res.download(zipFileName, zipFileName, (err) => {
+                if (err) {
+                  console.error('Error while downloading:', err);
+                  res.status(500).send('Error while downloading the file');
+                } else {
+                  //delete file
+                  deleteFile(filePath);
+                  deleteFile(fileTxtPath);
+                  fs.unlink(zipFileName, (err) => {
+                    if (err) {
+                      console.error('Error while deleting the file:', err);
+                    }
+                  });
+                }
+              });
+            });
           }
         } else {
           res.json({ success: false, message: 'cannot get content' });
@@ -110,7 +128,7 @@ export const downloadChapter = wrapRequestHandler(
             });
 
             zip.finalize(); */
-            /** res.set({
+/** res.set({
               'Content-Disposition': `attachment; filename="${fileName}"`,
               'Content-Type': 'text/plain'
             });

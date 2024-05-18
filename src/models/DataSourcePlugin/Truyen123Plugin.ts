@@ -5,7 +5,7 @@ import { max } from 'lodash';
 
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
-  static baseUrl: string = 'https://123truyeni.com';
+  static baseUrl: string = 'https://123truyenii.com';
   public constructor(name: string) {
     this.name = name;
   }
@@ -262,7 +262,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         // const author = (
         //   $('.wrapper').find('.container .info > div > div ').get(0) as unknown as HTMLElement
         // )?.textContent?.toString();
-        const description = $('.wrapper').find('.desc-text').text().trim(); //.find('br').text();
+        const description = $('.wrapper').find('.desc-text').text().trim().replaceAll('<br>', ' '); //.find('br').text();
         const detail = $('.wrapper').find('.info .label').text();
         const host = this.getBaseUrl();
         const link = searchString;

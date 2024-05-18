@@ -110,7 +110,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/vnd.api+json'
+          'Content-Type': 'application/vnd.api+json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
       if (response.ok) {
@@ -268,7 +269,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const cover = dataResponse.image;
         const author = dataResponse.author;
         const authorLink = this.convertToUnicodeAndCreateURL(dataResponse.author);
-        const description = dataResponse.description.trim();
+        const description = dataResponse.description.trim().replaceAll('<br>', ' ');
         const detail = dataResponse.status;
         const host = this.getBaseUrl();
         const categoryList = this.processCategoryList(
