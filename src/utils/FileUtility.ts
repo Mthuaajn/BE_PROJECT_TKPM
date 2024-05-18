@@ -17,6 +17,22 @@ export function removeFileExtension(fileName: string): string {
   }
   return fileName;
 }
+
+export function getFileExtension(fileName: string): string {
+  const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+  return fileExtension;
+}
+
+export function deleteFile(filePath: string): void {
+  fs.unlink(filePath, (error) => {
+    if (error) {
+      console.error('Error deleting file:', error);
+    } else {
+      console.log('File deleted successfully: ', filePath);
+    }
+  });
+}
+
 // module.exports = {
 //     getFileNamesInFolder: getFileNamesInFolder,
 // }

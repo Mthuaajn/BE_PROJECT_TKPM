@@ -5,7 +5,7 @@ import { max } from 'lodash';
 
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
-  static baseUrl: string = 'https://123truyeni.com';
+  static baseUrl: string = 'https://123truyenii.com';
   public constructor(name: string) {
     this.name = name;
   }
@@ -262,7 +262,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         // const author = (
         //   $('.wrapper').find('.container .info > div > div ').get(0) as unknown as HTMLElement
         // )?.textContent?.toString();
-        const description = $('.wrapper').find('.desc-text').text().trim(); //.find('br').text();
+        const description = $('.wrapper').find('.desc-text').text().trim().replaceAll('<br>', ' '); //.find('br').text();
         const detail = $('.wrapper').find('.info .label').text();
         const host = this.getBaseUrl();
         const link = searchString;
@@ -273,8 +273,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         //   return text;
         // });
         //console.log("maxChapterDiv: ",maxChapterDiv);
-       
-       /* const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
+
+        /* const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
         const listChapter = $('.wrapper')
           .find('.list-chapter li a')
           .map((_, childElement) => {
@@ -331,12 +331,17 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
   public async contentStory(title: string, chap?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/${title}/chuong-${chap}`;
+    const searchString2: string = `${this.getBaseUrl()}/${title}`;
     try {
       console.log('searchString: ', searchString);
+      console.log('searchString2: ', searchString2);
       const response = await fetch(searchString, {
         method: 'GET'
       });
-      if (response.ok) {
+      const response2 = await fetch(searchString2, {
+        method: 'GET'
+      });
+      if (response.ok && response2.ok) {
         const text = await response.text();
 
         const $ = cheerio.load(text);
@@ -351,13 +356,23 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         content = content.replace(/\n/g, '<br>');
         content = content.replaceAll('<br>', ' ');
         content = content.trim();
+
+        const text2 = await response2.text();
+
+        const $2 = cheerio.load(text2);
+
+        const cover = $2('.wrapper').find('.book img').first().attr('src');
+        const author = $2('.wrapper').find('.info').find('[itemprop="author"]').text();
+
         const data: object = {
           name,
           title,
           chapterTitle,
           chap,
           host,
-          content
+          content,
+          cover,
+          author
         };
 
         return data;

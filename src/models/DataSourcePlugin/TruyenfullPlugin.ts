@@ -110,7 +110,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/vnd.api+json'
+          'Content-Type': 'application/vnd.api+json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
       if (response.ok) {
@@ -199,7 +200,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
       if (response.ok) {
@@ -267,7 +269,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const cover = dataResponse.image;
         const author = dataResponse.author;
         const authorLink = this.convertToUnicodeAndCreateURL(dataResponse.author);
-        const description = dataResponse.description.trim();
+        const description = dataResponse.description.trim().replaceAll('<br>', ' ');
         const detail = dataResponse.status;
         const host = this.getBaseUrl();
         const categoryList = this.processCategoryList(
@@ -298,15 +300,23 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
 
   public async contentStory(title: string, chap?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${title}`;
+    const searchString2: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
     try {
       console.log('searchString: ', searchString);
+      console.log('searchString2: ', searchString2);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
           'User-Agent': 'PostmanRuntime/7.26.8'
         }
       });
-      if (response.ok) {
+      const response2 = await fetch(searchString2, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok && response2.ok) {
         const json = await response.json();
         const dataResponse: ContentStoryItemTruyenfull = json.data;
         const name = dataResponse.story_name;
@@ -314,13 +324,22 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const chapterTitle = dataResponse.chapter_name;
         const host = this.getBaseUrl();
         const content = dataResponse.content.replace(/<br\/>|<i>|<\/i>/g, '');
+
+        const json2 = await response2.json();
+        const dataResponse2: DetailStoryItemTruyenfull = json2.data;
+
+        const cover = dataResponse2.image;
+        const author = dataResponse2.author;
+
         const data: object = {
           name,
           title,
           chapterTitle,
           chap,
           host,
-          content
+          content,
+          cover,
+          author
         };
 
         return data;

@@ -1,10 +1,14 @@
 import { wrapRequestHandler } from '~/utils/handlers';
+import * as fs from 'fs';
+import archiver from 'archiver';
+import multer from 'multer';
 import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { FileExtensionManager } from '~/models/FileExtension/FileExtensionManager';
 import { IFileExtensionPlugin } from '~/models/FileExtension/IFileExtensionPlugin';
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
+import { deleteFile } from '~/utils/FileUtility';
 interface contentStoryAPI {
   name: string;
   title: string;
@@ -13,6 +17,7 @@ interface contentStoryAPI {
   host: string;
   content: string;
 }
+const upload = multer();
 export const downloadChapter = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const chap: string = req.query.chap?.toString() || '';
@@ -34,28 +39,150 @@ export const downloadChapter = wrapRequestHandler(
           const fileExtensionPlugin: IFileExtensionPlugin | null = fileExtensionManager.select(
             `${fileExtensionType}Plugin`
           );
+          const fileTxtExtensionPlugin: IFileExtensionPlugin | null =
+            fileExtensionManager.select('TXTPlugin');
+          if (fileExtensionPlugin != null && fileTxtExtensionPlugin != null) {
+            const filePath = await fileExtensionPlugin.createFile(title, chap, result.content);
+            const fileTxtPath = await fileTxtExtensionPlugin.createFile(
+              title,
+              chap,
+              result.content
+            );
 
-          if (fileExtensionPlugin != null) {
+            const fileName = `${title}_${chap}.${fileExtensionType.toLowerCase()}`;
+            const fileTxtName = `${title}_${chap}.txt`;
+
+            const files = [
+              { name: fileName, path: filePath },
+              { name: fileTxtName, path: fileTxtPath }
+            ];
+
+            const zipFileName = `${title}_${chap}.zip`; // Custom name for the ZIP file
+
+            // Set the appropriate headers
+            res.set({
+              'Content-Disposition': `attachment; filename="${zipFileName}"`,
+              'Content-Type': 'application/zip'
+            });
+
+            const zip = archiver('zip');
+            const output = fs.createWriteStream(zipFileName);
+            // zip.pipe(res);
+            zip.pipe(output);
+
+            files.forEach((file) => {
+              const fileStream = fs.createReadStream(file.path);
+              zip.append(fileStream, { name: file.name });
+            });
+
+            zip.finalize();
+            output.on('close', () => {
+              res.download(zipFileName, zipFileName, (err) => {
+                if (err) {
+                  console.error('Error while downloading:', err);
+                  res.status(500).send('Error while downloading the file');
+                } else {
+                  //delete file
+                  deleteFile(filePath);
+                  deleteFile(fileTxtPath);
+                  fs.unlink(zipFileName, (err) => {
+                    if (err) {
+                      console.error('Error while deleting the file:', err);
+                    }
+                  });
+                }
+              });
+            });
+          }
+        } else {
+          res.json({ success: false, message: 'cannot get content' });
+        }
+      } else {
+        res.json({ success: false, message: 'plugin source errors' });
+      }
+    } else {
+      res.json({ success: false, message: 'source is not valid' });
+    }
+  }
+);
+/** const files = [
+              { name: fileName, path: filePath },
+              { name: fileTxtName, path: fileTxtPath }
+            ];
+
+            const zipFileName = `${title}_${chap}.zip`; // Custom name for the ZIP file
+
+            // Set the appropriate headers
+            res.set({
+              'Content-Disposition': `attachment; filename="${zipFileName}"`,
+              'Content-Type': 'application/zip'
+            });
+
+            const zip = archiver('zip');
+
+            zip.pipe(res);
+
+            files.forEach((file) => {
+              const fileStream = fs.createReadStream(file.path);
+              zip.append(fileStream, { name: file.name });
+            });
+
+            zip.finalize(); */
+/** res.set({
+              'Content-Disposition': `attachment; filename="${fileName}"`,
+              'Content-Type': 'text/plain'
+            });
+            const file1Stream = fs.createReadStream(filePath);
+            file1Stream.pipe(res);
+
+            res.set({
+              'Content-Disposition': `attachment; filename="${fileTxtName}"`,
+              'Content-Type': 'text/plain'
+            });
+            const file2Stream = fs.createReadStream(fileTxtPath);
+            file2Stream.pipe(res); */
+/* if (fileExtensionPlugin != null) {
             const filePath = await fileExtensionPlugin.createFile(title, chap, result.content); //const fileName =
             if (filePath) {
               console.log('filePath: ', filePath);
-              res.download(filePath, filePath, (err) => {
-                if (err) {
-                  console.error('Error sending file:', err);
-                } else {
-                  console.log('File sent successfully.');
-                }
+              res.set({
+                'Content-Disposition': `attachment; filename="${title}_${chap}.${fileExtensionType.toLowerCase()}"`,
+                'Content-Type': 'text/plain'
               });
+              const file2Stream = fs.createReadStream(filePath);
+              file2Stream.pipe(res);
             } else {
               console.error('Error creating file.');
               res.sendStatus(500);
-             // res.json({msg: "error"})
             }
            
-            /* res.setHeader('Content-Type', 'application/octet-stream');
+          } else {
+            res.json({ success: false, message: 'plugin file extension errors' });
+          }
+          if (fileTxtExtensionPlugin != null) {
+            const fileTxtPath = await fileTxtExtensionPlugin.createFile(
+              title,
+              chap,
+              result.content
+            );
+            if (fileTxtPath) {
+              res.set({
+                'Content-Disposition': `attachment; filename="${title}_${chap}.txt"`,
+                'Content-Type': 'text/plain'
+              });
+              const file1Stream = fs.createReadStream(fileTxtPath);
+              file1Stream.pipe(res);
+            } else {
+              console.error('Error creating file.');
+              res.sendStatus(500);
+            }
+          } else {
+            res.json({ success: false, message: 'plugin file extension errors' });
+          } */
+/* res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Disposition', `attachment; filename=${requestedFile}`);
      res.send(file);*/
-            /*const files = [
+/*const files = [
     { path: './file1.docx', name: 'file1.docx' },
     { path: './file2.pdf', name: 'file2.pdf' }
     // Add more files as needed
@@ -71,17 +198,10 @@ export const downloadChapter = wrapRequestHandler(
       }
     });
   }); */
-          } else {
-            res.json({ success: false, message: 'plugin errors' });
-          }
-        } else {
-          res.json({ quantity: 0 });
-        }
-      } else {
-        res.json({ success: false, message: 'plugin errors' });
-      }
-    } else {
-      res.json({ success: false, message: 'source is not valid' });
-    }
-  }
-);
+// res.download(filePath, filePath, (err) => {
+//   if (err) {
+//     console.error('Error sending file:', err);
+//   } else {
+//     //console.log('File sent successfully.');
+//   }
+// });
