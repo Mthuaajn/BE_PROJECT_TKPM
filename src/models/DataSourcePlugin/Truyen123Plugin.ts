@@ -172,13 +172,15 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         //     : undefined;
 
         const maxPage = await this.getMaxChapterPage(title);
+        const chapterPerPage: number = 50;
         const data: object = {
           title,
           host,
           maxChapter,
           listChapter,
           currentPage: this.getNumberValueFromString(page),
-          maxPage
+          maxPage,
+          chapterPerPage
         };
 
         //console.log(data)

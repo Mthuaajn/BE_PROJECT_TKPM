@@ -217,6 +217,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const host = this.getBaseUrl();
         const maxChapter: number = json.meta.pagination.total;
         const maxPage: number = json.meta.pagination.total_pages;
+        const chapterPerPage: number = json.meta.pagination.per_page;
         const listChapter: { content: string; href: string }[] = [];
         dataResponse.forEach((value, index) => {
           const content = value.title;
@@ -230,7 +231,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           maxChapter,
           listChapter,
           currentPage: this.getNumberValueFromString(page),
-          maxPage
+          maxPage,
+          chapterPerPage
         };
 
         //console.log(data)
