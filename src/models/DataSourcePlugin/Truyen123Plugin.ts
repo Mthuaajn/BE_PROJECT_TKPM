@@ -1,9 +1,6 @@
-import { Category } from './../interface/TangThuVien.interface';
-import { listCategory } from './../../controllers/DataSource.controllers';
-import { url } from 'inspector';
+
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
-import { max } from 'lodash';
 
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
