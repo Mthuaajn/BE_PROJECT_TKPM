@@ -88,6 +88,15 @@ interface APIListChapterTruyenfullResponse {
   };
   data: ChapterItemTruyenfull[];
 }
+interface ChapterListTruyenfull {
+  title: string;
+  host: string;
+  maxChapter: number;
+  listChapter: { content: string; href: string }[];
+  currentPage: number;
+  maxPage: number;
+  chapterPerPage: number;
+}
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';
@@ -225,7 +234,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           listChapter.push({ content, href });
         });
 
-        const data: object = {
+        const data: ChapterListTruyenfull = {
           title,
           host,
           maxChapter,
@@ -307,11 +316,28 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   }
 
   public async contentStory(title: string, chap?: string): Promise<any> {
-    const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${title}`;
+    const chapterPerPage: number = 50;
+    if (!chap) chap = '1';
+    const chapNumber: number = Number.parseInt(chap);
+
+    const pageNumber: number =
+      Math.floor(chapNumber / chapterPerPage) + (chapNumber % chapterPerPage) === 0 ? 0 : 1;
+    let indexChapterInPage: number = (chapNumber % chapterPerPage) - 1;
+    indexChapterInPage = indexChapterInPage >= 0 ? indexChapterInPage : 0;
+    console.log('pageNumber: ', pageNumber);
+    console.log('indexChapterInPage: ', indexChapterInPage);
     const searchString2: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
+
     try {
+      const chapterList: ChapterListTruyenfull = await this.chapterList(
+        title,
+        pageNumber.toString()
+      );
+      const chapterId: string = chapterList.listChapter[indexChapterInPage].href;
+      const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${chapterId}`;
+
       console.log('searchString: ', searchString);
-      console.log('searchString2: ', searchString2);
+      console.log('searchString: ', searchString2);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
