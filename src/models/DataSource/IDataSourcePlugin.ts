@@ -16,4 +16,5 @@ export interface IDataSourcePlugin {
   newestStoryAtCategory(category: string, limiter?: number, page?: string): any;
   fullStoryAtCategory(category: string, limiter?: number, page?: string): any;
   hotStoryAtCategory(category: string, limiter?: number, page?: string): any;
+ // changeDetailStoryToAnotherDataSource(title: string): any;
 }

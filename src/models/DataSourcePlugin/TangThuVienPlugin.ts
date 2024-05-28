@@ -128,7 +128,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       const status = $(element).find('.author span').eq(0).text().trim();
       const update = $(element).find('.update span').text().trim();
       const totalChapter = parseInt($(element).find('.KIBoOgno').text().trim(), 10);
-
+      const link = $(element).find('.book-img-box a').first().attr('href') || '';
+      const startIndex = link.lastIndexOf('/') + 1;
+      const title = link.substring(startIndex);
       const story: Story = {
         name,
         cover,
@@ -138,9 +140,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         status,
         update,
         totalChapter,
-        link: 'no information',
-        title: 'no information',
-        host: 'https://truyen.tangthuvien.vn/',
+        link: link,
+        title: title,
+        host: this.getBaseUrl(),
         authorLink: 'no information',
         view: 'no information'
       };
