@@ -111,6 +111,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     return new TruyenfullPlugin(name);
   }
 
+  public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
+    
+  }
   public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/v1/tim-kiem?title=${encodeURIComponent(title)}&page=${page}`;

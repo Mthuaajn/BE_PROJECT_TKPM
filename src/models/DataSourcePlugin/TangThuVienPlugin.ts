@@ -66,6 +66,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     this.name = name;
   }
 
+  public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
+    //TODO: need to implement
+}
+
   getBaseUrl(): string {
     return TangThuVienPlugin.baseUrl;
   }

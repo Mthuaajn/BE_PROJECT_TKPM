@@ -1,4 +1,3 @@
-
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 
@@ -14,6 +13,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   }
   clone(name: string): IDataSourcePlugin {
     return new Truyen123Plugin(name);
+  }
+  public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
+      //TODO: need to implement
   }
 
   public async search(title: string, page?: string, category?: string): Promise<any> {

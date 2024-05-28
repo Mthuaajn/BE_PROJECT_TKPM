@@ -3,7 +3,7 @@ import { IFileExtensionPlugin } from '../FileExtension/IFileExtensionPlugin';
 import * as fs from 'fs';
 import EPub from 'epub-gen';
 import { before } from 'lodash';
-import { promisify } from 'util';//import { EPub } from 'epub-generator';
+import { promisify } from 'util'; //import { EPub } from 'epub-generator';
 export class EPUBPlugin implements IFileExtensionPlugin {
   name: string;
   public constructor() {
@@ -27,7 +27,6 @@ export class EPUBPlugin implements IFileExtensionPlugin {
       ]
     };
 
-    
     // return new Promise<string | null>(async (resolve, reject) => {
     //   try {
     //     const epub = new EPub(options, filePath);
@@ -40,7 +39,7 @@ export class EPUBPlugin implements IFileExtensionPlugin {
     // });
     try {
       const epub = await new EPub(options, filePath);
-      
+
       return filePath;
     } catch (err) {
       console.log('Error writing file:', err);
