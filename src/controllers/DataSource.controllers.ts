@@ -12,18 +12,6 @@ export const search = wrapRequestHandler(
     console.log('search:', search);
     console.log('source: ', source);
     console.log('category: ', category);
-    // const url = req.url;
-    // const regex = /datasource:([^/]+)/i;
-
-    // let source = null;
-    // const match = url.match(regex);
-    // if (match && match[1]) {
-    //     const extractedValue = match[1];
-    //     source = extractedValue;
-    //     console.log("source: ",extractedValue);
-    // } else {
-    //     console.log('String not found');
-    // }
 
     if (source != null) {
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();

@@ -321,8 +321,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     const chapNumber: number = Number.parseInt(chap);
 
     const pageNumber: number =
-      Math.floor(chapNumber / chapterPerPage) + (chapNumber % chapterPerPage) === 0 ? 0 : 1;
-    let indexChapterInPage: number = (chapNumber % chapterPerPage) - 1;
+      Math.floor(chapNumber / chapterPerPage) + (chapNumber % chapterPerPage === 0 ? 0 : 1);
+
+    let indexChapterInPage: number = (chapNumber - 1) % chapterPerPage; // array start from 0, chapter in page start from 1
     indexChapterInPage = indexChapterInPage >= 0 ? indexChapterInPage : 0;
     console.log('pageNumber: ', pageNumber);
     console.log('indexChapterInPage: ', indexChapterInPage);

@@ -4,7 +4,7 @@ import cheerio from 'cheerio';
 
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
-  static baseUrl: string = 'https://123truyenii.com';
+  static baseUrl: string = 'https://123truyeniii.com';
   public constructor(name: string) {
     this.name = name;
   }
