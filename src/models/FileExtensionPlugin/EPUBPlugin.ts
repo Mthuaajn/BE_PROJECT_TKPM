@@ -5,7 +5,10 @@ import EPub from 'epub-gen';
 import { before } from 'lodash';
 import { promisify } from 'util';//import { EPub } from 'epub-generator';
 export class EPUBPlugin implements IFileExtensionPlugin {
-  public constructor() {}
+  name: string;
+  public constructor() {
+    this.name = 'EPUBPlugin';
+  }
   clone(): IFileExtensionPlugin {
     return new EPUBPlugin();
   }

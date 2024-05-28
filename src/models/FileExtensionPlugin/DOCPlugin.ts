@@ -8,7 +8,10 @@ const docx = require('docx');
 // import { Document, Paragraph, TextRun } from 'docx';
 // import { Paragraph, TextRun } from 'docx';
 export class DOCPlugin implements IFileExtensionPlugin {
-  public constructor() {}
+  name: string;
+  public constructor() {
+    this.name = 'DOCPlugin';
+  }
   clone(): IFileExtensionPlugin {
     return new DOCPlugin();
   }

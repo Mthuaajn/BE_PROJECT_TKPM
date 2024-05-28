@@ -3,7 +3,10 @@ import { IFileExtensionPlugin } from '../FileExtension/IFileExtensionPlugin';
 import * as fs from 'fs';
 
 export class TXTPlugin implements IFileExtensionPlugin {
-  public constructor() {}
+  name: string;
+  public constructor() {
+    this.name = 'TXTPlugin';
+  }
   clone(): IFileExtensionPlugin {
     return new TXTPlugin();
   }

@@ -94,7 +94,7 @@ export class FileExtensionManager {
   public getAllPluginName(): string[] {
     const list: string[] = [];
     this.fileExtensionPlugin.forEach((value, key) => {
-      const str: string = key.replace(/plugin/g, '');
+      const str: string = value.name.replace(/Plugin/g, '');
       list.push(str);
     });
 

@@ -4,7 +4,10 @@ import * as fs from 'fs';
 import { saveAs } from 'file-saver';
 
 export class HTMLPlugin implements IFileExtensionPlugin {
-  public constructor() {}
+  name: string;
+  public constructor() {
+    this.name = 'HTMLPlugin';
+  }
   clone(): IFileExtensionPlugin {
     return new HTMLPlugin();
   }

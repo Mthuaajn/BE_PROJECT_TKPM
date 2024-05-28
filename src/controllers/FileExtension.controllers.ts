@@ -105,6 +105,17 @@ export const downloadChapter = wrapRequestHandler(
     }
   }
 );
+export const listFileExtension = wrapRequestHandler(
+  async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
+    const fileExtensionManager: FileExtensionManager = FileExtensionManager.getInstance();
+    const nameFileExtension: string[] = fileExtensionManager.getAllPluginName();
+    const data: object = {
+      length: nameFileExtension.length,
+      names: nameFileExtension
+    };
+    res.json(data);
+  }
+);
 /** const files = [
               { name: fileName, path: filePath },
               { name: fileTxtName, path: fileTxtPath }
