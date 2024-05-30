@@ -14,8 +14,108 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   clone(name: string): IDataSourcePlugin {
     return new Truyen123Plugin(name);
   }
+
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
-      //TODO: need to implement
+    try {
+      const data: object[] | null = await this.searchByTitle(title);
+      if (data === null) {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'not found'
+        };
+        return result;
+      } else {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+  public async searchByTitle(title: string, page?: string): Promise<any> {
+    if (!page) page = '1';
+    const searchString: string = `${this.getBaseUrl()}/search?q=${encodeURIComponent(title)}&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET'
+      });
+      if (response.ok) {
+        const text = await response.text();
+        const data: {
+          name: string;
+          link: string | undefined;
+          title: string | undefined;
+          cover: string | undefined;
+          description: string | undefined;
+          host: string | undefined;
+          author: string | undefined;
+          authorLink: string | undefined;
+          view: string | undefined;
+          categoryList: any[] | undefined;
+        }[] = [];
+
+        const $ = cheerio.load(text);
+
+        const elements = $('.list-new .row');
+
+        if (elements.length === 0) {
+          return null;
+        }
+        $('.list-new .row').each((index, element) => {
+          if (index === 1) {
+            return;
+          }
+          const name = $(element).find('.col-title h3').first().text().trim();
+
+          const link = $(element).find('a').first().attr('href');
+          const url = new URL(link ?? '');
+          const title = url.pathname.substr(1);
+          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+          const description = $(element).find('.chapter-text').first().text();
+          const author = $(element)
+            .find('.col-author a')
+            .contents()
+            .filter(function () {
+              return this.nodeType === 3;
+            })
+            .text()
+            .trim();
+          const authorUrl = $(element).find('.col-author a').attr('href');
+          const authorLink = authorUrl?.split('/').pop();
+          const view = $(element).find('.col-view.show-view').text().trim();
+          const categoryList = $(element)
+            .find('.col-category a')
+            .map((_, childElement) => {
+              const content = $(childElement).text().trim();
+              const href = $(childElement).attr('href')?.split('/').pop();
+              return { content, href };
+            })
+            .get();
+          data.push({
+            name,
+            link,
+            title,
+            cover,
+            description,
+            host: this.getBaseUrl(),
+            author,
+            authorLink,
+            view,
+            categoryList
+          });
+        });
+
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   public async search(title: string, page?: string, category?: string): Promise<any> {

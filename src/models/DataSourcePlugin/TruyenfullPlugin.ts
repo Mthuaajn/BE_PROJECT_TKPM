@@ -112,8 +112,95 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   }
 
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
-    
+    try {
+      const data: object[] | null = await this.searchByTitle(title);
+      if (data === null) {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'not found'
+        };
+        return result;
+      } else {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
+  public async searchByTitle(title: string, page?: string): Promise<any> {
+    if (!page) page = '1';
+    const searchString: string = `${this.getBaseUrl()}/v1/tim-kiem?title=${encodeURIComponent(title)}&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const dataArr: ItemTruyenfull[] = json.data;
+        const data: {
+          name: string;
+          link: string | undefined;
+          title: string | undefined;
+          cover: string | undefined;
+          description: string | undefined;
+          host: string | undefined;
+          author: string | undefined;
+          authorLink: string | undefined;
+          view: string | undefined;
+          categoryList: any[] | undefined;
+        }[] = [];
+
+        if (dataArr.length <= 0) {
+          return null;
+        }
+        dataArr.forEach((element: ItemTruyenfull) => {
+          if (data.length === 1) {
+            return;
+          }
+          const name = element?.title;
+          const link = this.convertToUnicodeAndCreateURL(element.title);
+          const title = element?.id.toString();
+          const cover = element.image;
+          const description = 'no information';
+          const host = this.getBaseUrl();
+          const author = element.author;
+          const authorLink = this.convertToUnicodeAndCreateURL(element.author);
+          const view = 'no information';
+          const categoryList = this.processCategoryList(element.categories, element.category_ids);
+
+          data.push({
+            name,
+            link,
+            title,
+            cover,
+            description,
+            host,
+            author,
+            authorLink,
+            //   view: undefined,
+            //   categoryList: undefined,
+            view,
+            categoryList
+          });
+        });
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
   public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/v1/tim-kiem?title=${encodeURIComponent(title)}&page=${page}`;
