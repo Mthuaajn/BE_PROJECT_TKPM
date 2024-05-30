@@ -84,8 +84,8 @@ export const downloadChapter = wrapRequestHandler(
                 } else {
                   //delete file
                   //TODO: 
-                  //deleteFile(filePath);
-                 // deleteFile(fileTxtPath);
+                  deleteFile(filePath);
+                  deleteFile(fileTxtPath);
                   fs.unlink(zipFileName, (err) => {
                     if (err) {
                       console.error('Error while deleting the file:', err);

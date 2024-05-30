@@ -69,7 +69,7 @@ export class DOCPlugin implements IFileExtensionPlugin {
 
       const doc = new (await require('docx')).default().Document();
       const paragraph = new (await require('docx')).default().Paragraph({
-        text: content,
+        text: content
       });
       doc.addParagraph(paragraph);
 
@@ -78,7 +78,7 @@ export class DOCPlugin implements IFileExtensionPlugin {
 
       // Save the buffer to a .docx file
       fs.writeFileSync(filePath, buffer);
-      
+
       return filePath;
     } catch (err) {
       console.log('Error writing file:', err);

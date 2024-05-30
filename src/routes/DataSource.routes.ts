@@ -1,4 +1,7 @@
-import { ListStoryAtCategory, changeDetailStoryDataSource } from './../controllers/DataSource.controllers';
+import {
+  ListStoryAtCategory,
+  changeDetailStoryDataSource
+} from './../controllers/DataSource.controllers';
 import { Router } from 'express';
 import {
   search,
