@@ -18,9 +18,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
     try {
       const data: object[] | null = await this.searchByTitle(title);
-      if (data === null) {
+      if (data === null || data.length <= 0) {
         const result: object = {
-          data: data ? data[0] : null,
+          data: null,
           message: 'not found'
         };
         return result;
@@ -67,14 +67,14 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           return null;
         }
         $('.list-new .row').each((index, element) => {
-          if (index === 1) {
+          if (data.length === 1) {
             return;
           }
           const name = $(element).find('.col-title h3').first().text().trim();
 
           const link = $(element).find('a').first().attr('href');
           const url = new URL(link ?? '');
-          const title = url.pathname.substr(1);
+          const titleOfStory = url.pathname.substr(1);
           const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
           const description = $(element).find('.chapter-text').first().text();
           const author = $(element)
@@ -96,18 +96,27 @@ export class Truyen123Plugin implements IDataSourcePlugin {
               return { content, href };
             })
             .get();
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host: this.getBaseUrl(),
-            author,
-            authorLink,
-            view,
-            categoryList
-          });
+
+          const lowerCaseName: string = name.toLowerCase();
+          const lowerCaseTitle: string = title.toLowerCase();
+          const found: boolean =
+            lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+          console.log('found: ', found);
+
+          if (found) {
+            data.push({
+              name,
+              link,
+              title: titleOfStory,
+              cover,
+              description,
+              host: this.getBaseUrl(),
+              author,
+              authorLink,
+              view,
+              categoryList
+            });
+          }
         });
 
         return data;

@@ -114,9 +114,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
     try {
       const data: object[] | null = await this.searchByTitle(title);
-      if (data === null) {
+      if (data === null || data.length <= 0) {
         const result: object = {
-          data: data ? data[0] : null,
+          data: null,
           message: 'not found'
         };
         return result;
@@ -169,7 +169,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           }
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id.toString();
+          const titleOfStory = element?.id.toString();
           const cover = element.image;
           const description = 'no information';
           const host = this.getBaseUrl();
@@ -178,20 +178,27 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           const view = 'no information';
           const categoryList = this.processCategoryList(element.categories, element.category_ids);
 
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host,
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
+          const lowerCaseName: string = name.toLowerCase();
+          const lowerCaseTitle: string = title.toLowerCase();
+          // console.log('name: ', lowerCaseName);
+          // console.log('title: ', lowerCaseTitle);
+          const found: boolean =
+            lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+          console.log('found: ', found);
+          if (found) {
+            data.push({
+              name,
+              link,
+              title: titleOfStory,
+              cover,
+              description,
+              host,
+              author,
+              authorLink,
+              view,
+              categoryList
+            });
+          }
         });
         return data;
       }
