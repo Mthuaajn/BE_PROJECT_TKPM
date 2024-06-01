@@ -1,6 +1,22 @@
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
+interface StoryData {
+  name: string;
+  link?: string;
+  title?: string;
+  cover?: string;
+  description?: string;
+  host?: string;
+  author?: string;
+  authorLink?: string;
+  view?: string;
+  categoryList?: any[];
+}
 
+interface changeDataSourceStory {
+  data: StoryData[];
+  message: string;
+}
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://123truyeniii.com';
@@ -13,6 +29,46 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   }
   clone(name: string): IDataSourcePlugin {
     return new Truyen123Plugin(name);
+  }
+
+  public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
+    if (!chap) chap = '1';
+    try {
+      const story: changeDataSourceStory | null =
+        await this.changeDetailStoryToThisDataSource(title);
+
+      const foundTitle: string | undefined =
+        story && story.data && story.data.length >= 1 ? story.data[0].title : undefined;
+
+      const checkedTitle: string = foundTitle ?? '';
+      if (checkedTitle) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+      const detailChapter = await this.contentStory(checkedTitle, chap);
+
+      if (detailChapter === null) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      } else {
+        const result: object = {
+          data: detailChapter,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {

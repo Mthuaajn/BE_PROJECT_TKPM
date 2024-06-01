@@ -1,5 +1,6 @@
 import {
   ListStoryAtCategory,
+  changeContentStoryDataSource,
   changeDetailStoryDataSource
 } from './../controllers/DataSource.controllers';
 import { Router } from 'express';
@@ -25,4 +26,5 @@ dataSourceRouter.get('/listCategory/*', listCategory);
 dataSourceRouter.get('/listChapter/*', listChapter);
 dataSourceRouter.get('/listStoryAtCategory/*', ListStoryAtCategory);
 dataSourceRouter.get('/changeDetailStoryDataSource/*', changeDetailStoryDataSource);
+dataSourceRouter.get('/changeContentStoryDataSource/*', changeContentStoryDataSource);
 export default dataSourceRouter;

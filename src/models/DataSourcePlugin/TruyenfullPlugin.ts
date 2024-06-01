@@ -2,6 +2,7 @@ import { url } from 'inspector';
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import e from 'express';
+import { data } from 'node_modules/cheerio/lib/api/attributes';
 interface ItemTruyenfull {
   id: string;
   title: string;
@@ -13,7 +14,6 @@ interface ItemTruyenfull {
   category_ids: string;
   total_chapters: number;
 }
-
 interface APITruyenfullResponse {
   status: string;
   message: string;
@@ -88,6 +88,22 @@ interface APIListChapterTruyenfullResponse {
   };
   data: ChapterItemTruyenfull[];
 }
+interface StoryData {
+  name: string;
+  link?: string;
+  title?: string;
+  cover?: string;
+  description?: string;
+  host?: string;
+  author?: string;
+  authorLink?: string;
+  view?: string;
+  categoryList?: any[];
+}
+interface changeDataSourceStory {
+  data: StoryData;
+  message: string;
+}
 interface ChapterListTruyenfull {
   title: string;
   host: string;
@@ -97,6 +113,7 @@ interface ChapterListTruyenfull {
   maxPage: number;
   chapterPerPage: number;
 }
+
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';
@@ -109,6 +126,47 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   }
   clone(name: string): IDataSourcePlugin {
     return new TruyenfullPlugin(name);
+  }
+  public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
+    if (!chap) chap = '1';
+    try {
+      const story: changeDataSourceStory | null =
+        await this.changeDetailStoryToThisDataSource(title);
+
+      const foundTitle: string | undefined =
+        story && story.data && story.message === 'found' ? story.data.title : undefined;
+
+      //console.log('story: ', story);
+      console.log('foundTitle: ', foundTitle);
+      const checkedTitle: string = foundTitle ?? '';
+      if (!checkedTitle || checkedTitle === '') {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+      const detailChapter = await this.contentStory(checkedTitle, chap);
+
+      if (detailChapter === null) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      } else {
+        const result: object = {
+          data: detailChapter,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
@@ -318,6 +376,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const json: APIListChapterTruyenfullResponse = await response.json();
+        if (json.meta.pagination.current_page > json.meta.pagination.total_pages) {
+          return null;
+        }
         const dataResponse: ChapterItemTruyenfull[] = json.data;
 
         const host = this.getBaseUrl();
@@ -431,6 +492,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         title,
         pageNumber.toString()
       );
+      if (chapterList === null) {
+        return null;
+      }
       const chapterId: string = chapterList.listChapter[indexChapterInPage].href;
       const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${chapterId}`;
 

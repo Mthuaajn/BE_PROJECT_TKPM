@@ -83,7 +83,6 @@ export const downloadChapter = wrapRequestHandler(
                   res.status(500).send('Error while downloading the file');
                 } else {
                   //delete file
-                  //TODO: 
                   deleteFile(filePath);
                   deleteFile(fileTxtPath);
                   fs.unlink(zipFileName, (err) => {
