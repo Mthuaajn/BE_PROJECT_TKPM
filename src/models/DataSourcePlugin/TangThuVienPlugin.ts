@@ -240,9 +240,11 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       const html = await response.text();
       result = this.getStory(html);
       if (category) {
-        result = result.filter((story) =>
-          story.categoryList.filter((el) => el.content === category)
-        );
+        result = result.filter((story) => {
+          return story.categoryList.some((el) => {
+            return el.content === category;
+          });
+        });
       }
     } catch (err) {
       console.log(err);

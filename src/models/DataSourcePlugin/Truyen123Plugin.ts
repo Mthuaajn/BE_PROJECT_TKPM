@@ -1,4 +1,3 @@
-
 import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 
