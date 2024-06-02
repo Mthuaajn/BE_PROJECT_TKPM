@@ -444,7 +444,9 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const cover = dataResponse.image;
         const author = dataResponse.author;
         const authorLink = this.convertToUnicodeAndCreateURL(dataResponse.author);
-        const description = dataResponse.description.trim().replaceAll('<br>', ' ');
+        const description = dataResponse.description
+          .trim()
+          .replaceAll(/<br\/>|<i>|<\/i>|<b>|<\/b>|<br>|<strong>|<\/strong>/g, '');
         const detail = dataResponse.status;
         const host = this.getBaseUrl();
         const categoryList = this.processCategoryList(
@@ -519,7 +521,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const title = dataResponse.story_id.toString();
         const chapterTitle = dataResponse.chapter_name;
         const host = this.getBaseUrl();
-        const content = dataResponse.content.replace(/<br\/>|<i>|<\/i>/g, '');
+        const content = dataResponse.content.replaceAll(/<br\/>|<i>|<\/i>|<b>|<\/b>/g, '');
 
         const json2 = await response2.json();
         const dataResponse2: DetailStoryItemTruyenfull = json2.data;
