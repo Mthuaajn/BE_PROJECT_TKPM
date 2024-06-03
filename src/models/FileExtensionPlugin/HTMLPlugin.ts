@@ -37,3 +37,4 @@ export class HTMLPlugin implements IFileExtensionPlugin {
 module.exports = {
   plugin: HTMLPlugin
 };
+
