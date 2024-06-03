@@ -2,7 +2,7 @@ import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 export interface Category {
   content: string;
-  numberStory: string;
+  host: string;
   href: string;
 }
 export interface Story {
@@ -19,24 +19,19 @@ export interface Story {
   host: string;
   authorLink: string;
   view: string;
-  status: string;
-  update: string;
-  totalChapter: number;
 }
 
 export interface DetailStory {
   name: string;
+  title: string;
+  link: string;
   cover: string;
   description: string;
   author: string;
+  authorLink: string;
   category: string;
-  status: string;
-  update: string;
-  follow: string;
-  like: string;
-  view: string;
-  totalChapter: number;
-  poster: string;
+  detail: string;
+  host: string;
 }
 
 export interface ContentStory {
@@ -46,7 +41,8 @@ export interface ContentStory {
   chapterTitle: string;
   content: string;
   author: string;
-  datePost: string;
+  cover: string;
+  host: string;
 }
 
 export interface ListChapter {
@@ -57,6 +53,33 @@ export interface ListChapter {
     content: string;
     href: string;
   }[];
+  currentPage: number;
+  maxPage: number;
+  chapterPerPage: number;
+}
+
+function removeVietnameseAccents(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+}
+
+function convertString(input: string): string {
+  // Chuyển đổi chuỗi về chữ thường
+  const lowerCaseStr = input.toLowerCase();
+
+  // Bỏ dấu tiếng Việt
+  const noAccentsStr = removeVietnameseAccents(lowerCaseStr);
+
+  // Thay thế các dấu cách bằng dấu gạch ngang
+  const kebabCaseStr = noAccentsStr.split(' ').join('-');
+
+  // Chỉ giữ lại các ký tự chữ thường và dấu gạch ngang
+  const validStr = kebabCaseStr.replace(/[^a-z-]/g, '');
+
+  return validStr;
 }
 
 export class TangThuVienPlugin implements IDataSourcePlugin {
@@ -73,40 +96,40 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return new TangThuVienPlugin(name);
   }
 
-  private getDetailStory = (html: string) => {
+  private getDetailStory = (html: string, searchString: string) => {
     const result: DetailStory[] = [];
     const $ = cheerio.load(html);
     const name = $('.book-info h1 ').text().trim();
+    const link = searchString;
+    const host = this.getBaseUrl();
     const cover = $('.book-img a img').attr('src') || '';
     const description = $('.book-info-detail .book-intro p').text().trim();
     const author = $('.tag a.blue').text().trim();
+    const authorLink = convertString(author);
     // method eq(1) lấy element thứ 2 xuất hiện
     const category = $('.tag a.red').eq(0).text().trim();
-    const status = $('.tag span.blue').eq(0).text().trim();
-    const like = $('span.ULtwOOTH-like').text().trim();
-    const follow = $('span.ULtwOOTH-follow').text().trim();
-    const view = $('span.ULtwOOTH-view').text().trim();
-    const poster = $('.book-info-detail .book-state li a.tags').text().trim();
-    const update = $('.book-info-detail li.update .detail a.blue').text().trim();
-    const totalChapterText = $('#j-bookCatalogPage').text().trim();
-    const totalChapterMatch = totalChapterText.match(/\((\d+) chương\)/);
-    const totalChapter = totalChapterMatch ? parseInt(totalChapterMatch[1], 10) : 0;
+    // const status = $('.tag span.blue').eq(0).text().trim();
+    // const like = $('span.ULtwOOTH-like').text().trim();
+    // const follow = $('span.ULtwOOTH-follow').text().trim();
+    // const view = $('span.ULtwOOTH-view').text().trim();
+    // const poster = $('.book-info-detail .book-state li a.tags').text().trim();
+    // // const update = $('.book-info-detail li.update .detail a.blue').text().trim();
+    // const totalChapterText = $('#j-bookCatalogPage').text().trim();
+    // const totalChapterMatch = totalChapterText.match(/\((\d+) chương\)/);
+    // const totalChapter = totalChapterMatch ? parseInt(totalChapterMatch[1], 10) : 0;
     const story: DetailStory = {
       name,
+      title: 'no information',
+      link,
       cover,
       description,
       author,
+      authorLink,
       category,
-      status,
-      update,
-      totalChapter,
-      like,
-      follow,
-      view,
-      poster
+      host,
+      detail: 'full'
     };
-    result.push(story);
-    return result;
+    return story;
   };
 
   private getStory = (html: string, limiter?: number) => {
@@ -125,9 +148,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         content: categoryElement.text().trim(),
         href: categoryElement.attr('href') || ''
       } as never;
-      const status = $(element).find('.author span').eq(0).text().trim();
-      const update = $(element).find('.update span').text().trim();
-      const totalChapter = parseInt($(element).find('.KIBoOgno').text().trim(), 10);
+      const link = convertString(name);
 
       const story: Story = {
         name,
@@ -135,10 +156,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         description,
         author,
         categoryList: [].concat(category) as { content: string; href: string }[],
-        status,
-        update,
-        totalChapter,
-        link: 'no information',
+        link,
         title: 'no information',
         host: 'https://truyen.tangthuvien.vn/',
         authorLink: 'no information',
@@ -158,12 +176,11 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       const link = $(element).find('a');
       if (link.length) {
         const content = link.find('span.info i').text().trim();
-        const numberStory = link.find('span.info b').text().trim();
         const href = link.attr('href') || '';
 
         result.push({
           content,
-          numberStory: numberStory === '' ? '...' : numberStory,
+          host: this.getBaseUrl(),
           href
         });
       }
@@ -178,29 +195,31 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     const chap = chapter.toString() || '';
     const title = $('.content .chapter h2').text().trim();
     const author = $('.chapter .text-center strong a').text().trim();
-    const datePost = $('.chapter .text-center').eq(1).text().trim();
     const content = $('.box-chap').text().trim();
+    const host = this.getBaseUrl();
+    const cover = 'no information';
     const story = {
       name,
       chapterTitle,
       chap,
       title,
       author,
-      datePost,
-      content
+      content,
+      cover,
+      host
     };
 
     return story;
   };
 
-  private getListChapterStory = (html: string, chapter: string, url: string) => {
+  private getListChapterStory = (html: string, page: string, url: string) => {
     const $ = cheerio.load(html);
     const totalChapterText = $('#j-bookCatalogPage').text().trim();
     const totalChapterMatch = totalChapterText.match(/\((\d+) chương\)/);
     const maxChapter = totalChapterMatch ? parseInt(totalChapterMatch[1], 10) : 0;
     const title = $('.book-info h1').text().trim();
     const host = url;
-
+    const currentPage = Number(page) || 1;
     const listChapter: Array<{ content: string; href: string }> = [];
     $('.volume-wrap #max-volume .cf li ').each((index, element) => {
       const content = $(element).find('a').attr('title')?.toString() || '';
@@ -210,12 +229,17 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         href
       });
     });
+    const chapterPerPage = listChapter.length - 1;
+    const maxPage = Math.ceil(maxChapter / listChapter.length);
 
     const result: ListChapter = {
       title,
       host,
       maxChapter,
-      listChapter
+      listChapter,
+      currentPage,
+      maxPage,
+      chapterPerPage
     };
     return result;
   };
@@ -254,7 +278,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   }
   async newestStory(limiter?: number, page?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?ord=new&page=${page}`;
-    let result: Story[] = [];
+    let result: Story[];
     try {
       const response = await fetch(searchString, {
         method: 'GET',
@@ -268,7 +292,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    return {
+      hot: result
+    };
   }
   async fullStory(limiter?: number, page?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=nm&page=${page}`;
@@ -380,7 +406,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   }
   public async detailStory(title: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/doc-truyen/${title}`;
-    let result: DetailStory[] = [];
+    let result: DetailStory;
     try {
       const response = await fetch(searchString, {
         method: 'GET',
@@ -389,7 +415,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         }
       });
       const html = await response.text();
-      result = this.getDetailStory(html);
+      result = this.getDetailStory(html, searchString);
     } catch (err) {
       console.log(err);
       return null;

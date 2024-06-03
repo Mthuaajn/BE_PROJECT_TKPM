@@ -1,5 +1,6 @@
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
+import { listChapter } from '~/controllers/DataSource.controllers';
 
 interface Story {
   name: string;
@@ -25,6 +26,9 @@ interface ListChapter {
     content: string;
     href: string;
   }[];
+  currentPage: number;
+  maxPage: number;
+  chapterPerPage: number;
 }
 
 interface Category {
@@ -168,8 +172,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       author,
       authorLink: 'no information'
     };
-    result.push(story);
-    return result;
+    return story;
   };
 
   private getStory = (html: string, limiter?: number) => {
@@ -224,13 +227,25 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       .find('.watch-chapter-content h1.watch-chapter-title')
       .text()
       .trim();
-    const listContent = $('.watch-main').find('.watch-chapter-content .watch-chapter-detail p');
-    const content = listContent
-      .map((index, el) => {
-        return $(el).text().trim();
-      })
-      .get()
-      .join('\n');
+    let content;
+    const temp = $('.watch-main').find('.chart-story .row');
+    if (temp) {
+      content = temp
+        .map((index, el) => {
+          return $(el).text().trim();
+        })
+        .get()
+        .join('\n');
+    } else {
+      const listContent = $('.watch-main').find('.watch-chapter-content .watch-chapter-detail p');
+      content = listContent
+        .map((index, el) => {
+          return $(el).text().trim();
+        })
+        .get()
+        .join('\n');
+    }
+
     const hot = `${this.getBaseUrl()}`;
     const story = {
       name,
@@ -274,7 +289,10 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       title,
       host,
       maxChapter: maxChapter,
-      listChapter: ListCategory.get()
+      listChapter: ListCategory.get(),
+      currentPage: Number(chapter) || 1,
+      maxPage: Math.ceil(maxChapter / ListCategory.get().length) - 1 || 1,
+      chapterPerPage: ListCategory.get().length || 1
     };
     return result;
   };
@@ -310,7 +328,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   }
   async newestStory(limiter?: number, page?: string): Promise<any> {
     const searchString = `${this.getBaseUrl()}//vi/genre/2/0/1?page=${page || 0}`;
-    let result: Story[] = [];
+    let result: Story[];
     try {
       const response = await fetch(searchString, {
         method: 'GET',
@@ -324,7 +342,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    return { hot: result };
   }
   async fullStory(limiter?: number, page?: string): Promise<any> {
     const searchString = `${this.getBaseUrl()}//vi/genre/2/0/2?page=${page || 0}`;
@@ -418,8 +436,8 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       result = this.getContentStory(html, chap as string);
       result = {
         ...result,
-        author: detailStory[0].author,
-        cover: detailStory[0].cover
+        author: detailStory.author,
+        cover: detailStory.cover
       };
     } catch (err) {
       console.log(err);
@@ -454,7 +472,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     if (resultSearch.length === 0) return null;
     const searchString = resultSearch[0].link;
     // const searchString: string = `${this.getBaseUrl()}/vi/${title}?content_id=${content_id || 0}`;
-    let result: DetailStory[] = [];
+    let result: DetailStory;
     try {
       const response = await fetch(searchString, {
         method: 'GET',
