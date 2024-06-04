@@ -121,7 +121,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     $('.recommend-comics .recommend-item ').each((index, element) => {
       const name = $(element).find('.recommend-comics-title').text().trim();
       const link = $(element).find('a').attr('href') || '';
-      const cover = $(element).find('a .comics-image img').attr('src') || '';
+      const cover = $(element).find('a .comics-image img').attr('data-src') || '';
       const description = $(element).find('.comics-type span').text().trim();
       const category = convertStringToCategoryList(description, '/');
       const story: Story = {
