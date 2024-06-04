@@ -292,9 +292,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return {
-      hot: result
-    };
+    return result;
   }
   async fullStory(limiter?: number, page?: string): Promise<any> {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=nm&page=${page}`;

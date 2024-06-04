@@ -342,7 +342,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return { hot: result };
+    return result;
   }
   async fullStory(limiter?: number, page?: string): Promise<any> {
     const searchString = `${this.getBaseUrl()}//vi/genre/2/0/2?page=${page || 0}`;
