@@ -315,8 +315,6 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
             host,
             author,
             authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
             view,
             categoryList
           });

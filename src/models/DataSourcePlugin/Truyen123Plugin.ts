@@ -215,20 +215,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         method: 'GET'
       });
       if (response.ok) {
-        // let doc = response.html();
-        // let data = [];
-        // doc.select(".list-new .row").forEach(e => {
-        //     data.push({
-        //         name: e.select(".col-title h3").first().text(),
-        //         link: e.select("a").first().attr("href"),
-        //         cover: e.select(".thumb img").first().attr("src").replace('-thumbw',''),
-        //         description: e.select(".chapter-text").first().text(),
-        //         host: this.getBaseUrl()
-        //     });
-        // });
-
-        //console.log(response)
-        // return Response.success(data);
         const text = await response.text();
         const data: {
           name: string;
@@ -244,15 +230,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         }[] = [];
 
         const $ = cheerio.load(text);
-        // htmlDoc.select(".list-new .row").forEach(e => {
-        //     data.push({
-        //         name: e.select(".col-title h3").first().text(),
-        //         link: e.select("a").first().attr("href"),
-        //         cover: e.select(".thumb img").first().attr("src").replace('-thumbw',''),
-        //         description: e.select(".chapter-text").first().text(),
-        //         host: this.getBaseUrl()
-        //     });
-        // });
         $('.list-new .row').each((index, element) => {
           const name = $(element).find('.col-title h3').first().text().trim();
 
@@ -325,12 +302,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
         const host = this.getBaseUrl();
         const maxChapterDiv = $('.wrapper').find('.l-chapter .l-chapters li a span').first();
-        // .map((_, childElement) => {
-        //   const text = $(childElement).text();
-        //   console.log(text);
-        //   return text;
-        // });
-        //console.log("maxChapterDiv: ",maxChapterDiv);
+      
         const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
         const listChapter = $('.wrapper')
           .find('.list-chapter li a')
@@ -340,26 +312,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             return { content, href };
           })
           .get();
-        // const chapterPagination: { content: string; href: string | undefined }[] | undefined =
-        //   ($('.wrapper')
-        //     .find('.pagination li a')
-        //     .map((_, childElement) => {
-        //       const content = $(childElement).text().trim();
-        //       const href = $(childElement).attr('href')?.split('/').pop();
-        //       return { content, href };
-        //     })
-        //     .get() as { content: string; href: string | undefined }[]) || [];
-        // // .pop();
-
-        // const maxPage =
-        //   chapterPagination.length > 0
-        //     ? chapterPagination.forEach((value, index) => {
-        //         const number: number = this.getNumberValueFromString(value.content);
-        //         if (number != -1) {
-        //           return number;
-        //         }
-        //       })
-        //     : undefined;
 
         const maxPage = await this.getMaxChapterPage(title);
         const chapterPerPage: number = 50;
@@ -410,14 +362,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             : '0';
 
         const valueMaxPage = this.getNumberValueFromString(maxPage ? maxPage : '0');
-        // chapterPagination.length > 0
-        //   ? chapterPagination.forEach((value, index) => {
-        //       const number: number = this.getNumberValueFromString(value.content);
-        //       if (number != -1) {
-        //         return number;
-        //       }
-        //     }).get()
-        //   : undefined;
 
         const data: number = valueMaxPage;
         //console.log(data)
@@ -464,30 +408,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const host = this.getBaseUrl();
         const link = searchString;
         const maxChapterDiv = $('.wrapper').find('.l-chapter .l-chapters li a span').first();
-        // .map((_, childElement) => {
-        //   const text = $(childElement).text();
-        //   console.log(text);
-        //   return text;
-        // });
-        //console.log("maxChapterDiv: ",maxChapterDiv);
-
-        /* const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
-        const listChapter = $('.wrapper')
-          .find('.list-chapter li a')
-          .map((_, childElement) => {
-            const content = $(childElement).text().trim();
-            const href = $(childElement).attr('href')?.split('/').pop();
-            return { content, href };
-          })
-          .get();
-        const chapterPagination = $('.wrapper')
-          .find('.pagination li a')
-          .map((_, childElement) => {
-            const content = $(childElement).text().trim();
-            const href = $(childElement).attr('href')?.split('/').pop();
-            return { content, href };
-          })
-          .get();*/
+      
         const data: object = {
           name,
           title,
@@ -608,7 +529,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
         const $ = cheerio.load(text);
         $('.list-new .row').each((index, element) => {
-          if (index >= limiter) {
+          if (limiter && index >= limiter) {
             return;
           }
           const name = $(element).find('.col-title h3').first().text().trim();
@@ -646,8 +567,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             host: this.getBaseUrl(),
             author,
             authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
+       
             view,
             categoryList
           });
@@ -724,8 +644,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             host: this.getBaseUrl(),
             author,
             authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
+           
             view,
             categoryList
           });

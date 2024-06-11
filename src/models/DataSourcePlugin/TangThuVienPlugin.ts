@@ -95,7 +95,7 @@ interface StoryData {
 }
 
 interface changeDataSourceStory {
-  data: StoryData[];
+  data: StoryData;
   message: string;
 }
 export class TangThuVienPlugin implements IDataSourcePlugin {
@@ -106,7 +106,44 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   }
 
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
-    //TODO: need to implement
+    try {
+      const data: object[] | null = await this.searchByTitle(title);
+      if (data === null || data.length <= 0) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+        return result;
+      } else {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+  public async searchByTitle(title: string, page?: string): Promise<any> {
+    const searchString: string = `${this.getBaseUrl()}/ket-qua-tim-kiem?term=${title}&page=${page}`;
+    let result: Story[] | null = [];
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
+      });
+      const html = await response.text();
+      result = this.getStoryMostLikeTitle(html, title);
+      
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return result;
   }
 
   public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
@@ -116,10 +153,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         await this.changeDetailStoryToThisDataSource(title);
 
       const foundTitle: string | undefined =
-        story && story.data && story.data.length >= 1 ? story.data[0].title : undefined;
+        story && story.data && story.message === 'found' ? story.data.title : undefined;
 
       const checkedTitle: string = foundTitle ?? '';
-      if (checkedTitle) {
+      if (!checkedTitle || checkedTitle === '') {
         const result: object = {
           data: null,
           message: 'not found'
@@ -127,6 +164,18 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
 
         return result;
       }
+
+      const chapterPaginationData: ListChapter = await this.chapterList(checkedTitle);
+      const chapNumber: number = Number.parseInt(chap);
+      if (chapNumber > chapterPaginationData.maxChapter) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+
       const detailChapter = await this.contentStory(checkedTitle, chap);
 
       if (detailChapter === null) {
@@ -231,6 +280,59 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return result;
   };
 
+  private getStoryMostLikeTitle = (html: string, searchedTitle: string, limiter?: number) => {
+    const result: Story[] = [];
+    const $ = cheerio.load(html);
+
+    const elements = $('#rank-view-list li');
+
+    if (elements.length === 0) {
+      return null;
+    }
+
+    $('#rank-view-list li').each((index, element) => {
+      if (result.length === 1) return;
+      const name = $(element).find('.book-mid-info h4 a').text().trim();
+      const cover = $(element).find('.book-img-box img').attr('src') || '';
+      const description = $(element).find('.intro').text().trim();
+      const author = $(element).find('.author a.name').text().trim();
+      // method eq(1) lấy element thứ 2 xuất hiện
+      // const category = $(element).find('.author a').eq(1).text().trim();
+      const categoryElement = $(element).find('.author a').eq(1);
+      const category = {
+        content: categoryElement.text().trim(),
+        href: categoryElement.attr('href') || ''
+      } as never;
+      //const link = convertString(name);
+      const link = $(element).find('.book-img-box a').first().attr('href') || '';
+      const startIndex = link.lastIndexOf('/') + 1;
+      const title = link.substring(startIndex);
+
+      const lowerCaseName: string = name.toLowerCase();
+      const lowerCaseTitle: string = searchedTitle.toLowerCase();
+      const found: boolean =
+        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+
+      if (found) {
+        const story: Story = {
+          name,
+          cover,
+          description,
+          author,
+          categoryList: [].concat(category) as { content: string; href: string }[],
+          link,
+          title: title,
+          host: 'https://truyen.tangthuvien.vn/',
+          authorLink: 'no information',
+          view: 'no information'
+        };
+
+        result.push(story);
+      }
+    });
+    return result;
+  };
+
   private getCategoryList = (html: string) => {
     const $ = cheerio.load(html);
     const result: Category[] = [];
@@ -257,7 +359,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     const name = $('h1.truyen-title a').text().trim();
     const chapterTitle = $('.content .chapter h2').text().trim();
     const chap = chapter.toString() || '';
-   // const title = $('.content .chapter h2').text().trim();
+    // const title = $('.content .chapter h2').text().trim();
     const author = $('.chapter .text-center strong a').text().trim();
     const content = $('.box-chap').text().trim();
     const host = this.getBaseUrl();
