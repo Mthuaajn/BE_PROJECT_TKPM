@@ -483,10 +483,12 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     const pageNumber: number =
       Math.floor(chapNumber / chapterPerPage) + (chapNumber % chapterPerPage === 0 ? 0 : 1);
 
+    console.log('pageNumber: ', pageNumber);
+
     let indexChapterInPage: number = (chapNumber - 1) % chapterPerPage; // array start from 0, chapter in page start from 1
     indexChapterInPage = indexChapterInPage >= 0 ? indexChapterInPage : 0;
-    console.log('pageNumber: ', pageNumber);
     console.log('indexChapterInPage: ', indexChapterInPage);
+
     const searchString2: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
 
     try {
@@ -495,6 +497,18 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         pageNumber.toString()
       );
       if (chapterList === null) {
+        console.log('ChapterList is null');
+        return null;
+      }
+
+      const countChapterInCurrentPage: number = chapterList.listChapter.length;
+
+      console.log('countChapterInCurrentPage: ', countChapterInCurrentPage);
+      if (
+        !chapterList.listChapter[indexChapterInPage] ||
+        chapterList.listChapter[indexChapterInPage] === null ||
+        chapterList.listChapter[indexChapterInPage] === undefined
+      ) {
         return null;
       }
       const chapterId: string = chapterList.listChapter[indexChapterInPage].href;
