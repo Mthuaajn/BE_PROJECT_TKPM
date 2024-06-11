@@ -366,6 +366,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     }
   }
   public async contentStory(title: string, chap?: string): Promise<any> {
+    const storyDetail: DetailStory = await this.detailStory(title);
     const searchString: string = `${this.getBaseUrl()}/doc-truyen/${title}/chuong-${chap}`;
     let result: ContentStory;
     try {
@@ -381,7 +382,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    return { ...result, cover: storyDetail.cover };
   }
   public async chapterList(title: string, page?: string): Promise<any> {
     let result: ListChapter;
