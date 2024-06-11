@@ -34,6 +34,7 @@ export const downloadChapter = wrapRequestHandler(
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         const result: contentStoryAPI | null = await plugin.contentStory(title, chap);
+        console.log(result);
         if (result != null) {
           const fileExtensionManager: FileExtensionManager = FileExtensionManager.getInstance();
           const fileExtensionPlugin: IFileExtensionPlugin | null = fileExtensionManager.select(
@@ -42,7 +43,12 @@ export const downloadChapter = wrapRequestHandler(
           const fileTxtExtensionPlugin: IFileExtensionPlugin | null =
             fileExtensionManager.select('TXTPlugin');
           if (fileExtensionPlugin != null && fileTxtExtensionPlugin != null) {
-            const filePath = await fileExtensionPlugin.createFile(title, chap, result.content);
+            const filePath = await fileExtensionPlugin.createFile(
+              title,
+              chap,
+              result.content,
+              result.chapterTitle ? result.chapterTitle : ''
+            );
             const fileTxtPath = await fileTxtExtensionPlugin.createFile(
               title,
               chap,
