@@ -138,7 +138,6 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       });
       const html = await response.text();
       result = this.getStoryMostLikeTitle(html, title);
-      
     } catch (err) {
       console.log(err);
       return null;

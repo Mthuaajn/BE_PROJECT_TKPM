@@ -302,7 +302,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
         const host = this.getBaseUrl();
         const maxChapterDiv = $('.wrapper').find('.l-chapter .l-chapters li a span').first();
-      
+
         const maxChapter = this.getNumberValueFromString(maxChapterDiv.text());
         const listChapter = $('.wrapper')
           .find('.list-chapter li a')
@@ -408,7 +408,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const host = this.getBaseUrl();
         const link = searchString;
         const maxChapterDiv = $('.wrapper').find('.l-chapter .l-chapters li a span').first();
-      
+
         const data: object = {
           name,
           title,
@@ -567,7 +567,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             host: this.getBaseUrl(),
             author,
             authorLink,
-       
+
             view,
             categoryList
           });
@@ -644,7 +644,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             host: this.getBaseUrl(),
             author,
             authorLink,
-           
+
             view,
             categoryList
           });
