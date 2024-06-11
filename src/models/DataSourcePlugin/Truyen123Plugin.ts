@@ -17,6 +17,16 @@ interface changeDataSourceStory {
   data: StoryData;
   message: string;
 }
+interface ChapterListTruyen123 {
+  title: string;
+  host: string;
+  maxChapter: number;
+  listChapter: { content: string; href: string }[];
+  currentPage: number;
+  maxPage: number;
+  chapterPerPage: number;
+}
+
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://123truyen.info';
@@ -42,8 +52,19 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       // story && story.data && story.data.length >= 1 ? story.data[0].title : undefined;
 
       const checkedTitle: string = foundTitle ?? '';
-      console.log('checkedTitle: ', checkedTitle);
+      // console.log('checkedTitle: ', checkedTitle);
       if (!checkedTitle || checkedTitle === '') {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+
+      const chapterPaginationData: ChapterListTruyen123 = await this.chapterList(checkedTitle);
+      const chapNumber: number = Number.parseInt(chap);
+      if (chapNumber > chapterPaginationData.maxChapter) {
         const result: object = {
           data: null,
           message: 'not found'
@@ -159,7 +180,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
           const lowerCaseTitle: string = title.toLowerCase();
           const found: boolean =
             lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
-          console.log('found in search by title: ', found);
+          //console.log('found in search by title: ', found);
 
           if (found) {
             data.push({
@@ -527,7 +548,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const chapterTitle = $('.wrapper').find('div.chapter-title').text().trim();
         $('.wrapper').find('.chapter-content div').remove();
         let content = $('.wrapper').find('div.chapter-content').html() ?? '';
-       // console.log('content: ', content);
+        // console.log('content: ', content);
         content = content.replace(/<!-- (.*?) -->/gm, '');
         //content = content.replace(/<p(.*?)>(.*?)<?p>/g, '');
         content = content.replace(/<span(.*?)>(.*?)<?span>/g, '');
@@ -543,7 +564,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const cover = $2('.wrapper').find('.book img').first().attr('src');
         const author = $2('.wrapper').find('.info').find('[itemprop="author"]').text();
 
-        
         const data: object = {
           name,
           title,
