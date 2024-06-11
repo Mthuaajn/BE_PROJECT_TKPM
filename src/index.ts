@@ -15,7 +15,7 @@ import { FileExtensionManager } from './models/FileExtension/FileExtensionManage
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // require('ts-node').register();
 // require('./index.ts');
-
+// "puppeteer": "^22.10.0"
 const port = 3000;
 const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();

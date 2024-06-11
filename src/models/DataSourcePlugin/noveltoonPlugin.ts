@@ -107,6 +107,12 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   public constructor(name: string) {
     this.name = name;
   }
+  changeDetailStoryToThisDataSource(title: string) {
+    throw new Error('Method not implemented.');
+  }
+  changeContentStoryToThisDataSource(title: string, chap?: string | undefined) {
+    throw new Error('Method not implemented.');
+  }
 
   getBaseUrl(): string {
     return NoveltoonPlugin.baseUrl;

@@ -2,7 +2,7 @@ import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 export interface Category {
   content: string;
-  host: string;
+  // host: string;
   href: string;
 }
 export interface Story {
@@ -29,7 +29,7 @@ export interface DetailStory {
   description: string;
   author: string;
   authorLink: string;
-  category: string;
+  categoryList: Category[];
   detail: string;
   host: string;
 }
@@ -53,33 +53,33 @@ export interface ListChapter {
     content: string;
     href: string;
   }[];
-currentPage: number;
-maxPage: number;
-chapterPerPage: number;
+  currentPage: number;
+  maxPage: number;
+  chapterPerPage: number;
 }
 
 function removeVietnameseAccents(str: string): string {
-return str
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .replace(/đ/g, 'd')
-  .replace(/Đ/g, 'D');
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
 }
 
 function convertString(input: string): string {
-// Chuyển đổi chuỗi về chữ thường
-const lowerCaseStr = input.toLowerCase();
+  // Chuyển đổi chuỗi về chữ thường
+  const lowerCaseStr = input.toLowerCase();
 
-// Bỏ dấu tiếng Việt
-const noAccentsStr = removeVietnameseAccents(lowerCaseStr);
+  // Bỏ dấu tiếng Việt
+  const noAccentsStr = removeVietnameseAccents(lowerCaseStr);
 
-// Thay thế các dấu cách bằng dấu gạch ngang
-const kebabCaseStr = noAccentsStr.split(' ').join('-');
+  // Thay thế các dấu cách bằng dấu gạch ngang
+  const kebabCaseStr = noAccentsStr.split(' ').join('-');
 
-// Chỉ giữ lại các ký tự chữ thường và dấu gạch ngang
-const validStr = kebabCaseStr.replace(/[^a-z-]/g, '');
+  // Chỉ giữ lại các ký tự chữ thường và dấu gạch ngang
+  const validStr = kebabCaseStr.replace(/[^a-z-]/g, '');
 
-return validStr;
+  return validStr;
 }
 interface StoryData {
   name: string;
@@ -156,7 +156,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return new TangThuVienPlugin(name);
   }
 
-  private getDetailStory = (html: string, searchString: string) => {
+  private getDetailStory = (html: string, searchString: string, title: string) => {
     const result: DetailStory[] = [];
     const $ = cheerio.load(html);
     const name = $('.book-info h1 ').text().trim();
@@ -166,8 +166,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     const description = $('.book-info-detail .book-intro p').text().trim();
     const author = $('.tag a.blue').text().trim();
     const authorLink = convertString(author);
+    const categoryList: Category[] = [];
     // method eq(1) lấy element thứ 2 xuất hiện
     const category = $('.tag a.red').eq(0).text().trim();
+    categoryList.push({ content: category, href: convertString(category) });
     // const status = $('.tag span.blue').eq(0).text().trim();
     // const like = $('span.ULtwOOTH-like').text().trim();
     // const follow = $('span.ULtwOOTH-follow').text().trim();
@@ -179,13 +181,13 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     // const totalChapter = totalChapterMatch ? parseInt(totalChapterMatch[1], 10) : 0;
     const story: DetailStory = {
       name,
-      title: 'no information',
+      title: title,
       link,
       cover,
       description,
       author,
       authorLink,
-      category,
+      categoryList,
       host,
       detail: 'full'
     };
@@ -208,7 +210,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         content: categoryElement.text().trim(),
         href: categoryElement.attr('href') || ''
       } as never;
-      const link = convertString(name);
+      //const link = convertString(name);
       const link = $(element).find('.book-img-box a').first().attr('href') || '';
       const startIndex = link.lastIndexOf('/') + 1;
       const title = link.substring(startIndex);
@@ -219,7 +221,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         author,
         categoryList: [].concat(category) as { content: string; href: string }[],
         link,
-        title: 'no information',
+        title: title,
         host: 'https://truyen.tangthuvien.vn/',
         authorLink: 'no information',
         view: 'no information'
@@ -242,7 +244,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
 
         result.push({
           content,
-          host: this.getBaseUrl(),
+          //host: this.getBaseUrl(),
           href
         });
       }
@@ -250,12 +252,12 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return result;
   };
 
-  private getContentStory = (html: string, chapter: string) => {
+  private getContentStory = (html: string, chapter: string, title: string) => {
     const $ = cheerio.load(html);
     const name = $('h1.truyen-title a').text().trim();
     const chapterTitle = $('.content .chapter h2').text().trim();
     const chap = chapter.toString() || '';
-    const title = $('.content .chapter h2').text().trim();
+   // const title = $('.content .chapter h2').text().trim();
     const author = $('.chapter .text-center strong a').text().trim();
     const content = $('.box-chap').text().trim();
     const host = this.getBaseUrl();
@@ -438,7 +440,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         }
       });
       const html = await response.text();
-      result = this.getContentStory(html, chap as string);
+      result = this.getContentStory(html, chap as string, title);
     } catch (err) {
       console.log(err);
       return null;
@@ -475,7 +477,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         }
       });
       const html = await response.text();
-      result = this.getDetailStory(html, searchString);
+      result = this.getDetailStory(html, searchString, title);
     } catch (err) {
       console.log(err);
       return null;

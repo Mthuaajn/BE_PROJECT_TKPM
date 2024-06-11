@@ -7,7 +7,10 @@ function sanitizeTitle(title: string): string {
 }
 
 export class PDFPlugin implements IFileExtensionPlugin {
-  public constructor() {}
+  name: string;
+  public constructor() {
+    this.name = 'PDFPlugin';
+  }
 
   clone(): IFileExtensionPlugin {
     return new PDFPlugin();
