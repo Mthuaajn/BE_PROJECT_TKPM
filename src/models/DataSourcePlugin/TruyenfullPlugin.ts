@@ -798,7 +798,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const data: {
           content: string | undefined;
           href: string | undefined;
-          host: string | undefined;
+         // host: string | undefined;
         }[] = [];
 
         const $ = cheerio.load(text);
@@ -809,7 +809,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           data.push({
             content,
             href,
-            host: this.getBaseUrl()
+           // host: this.getBaseUrl()
           });
         });
         //console.log(data)

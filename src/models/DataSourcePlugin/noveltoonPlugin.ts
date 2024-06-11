@@ -17,6 +17,18 @@ interface Story {
   }[];
   view: string;
 }
+interface StoryData {
+  name: string;
+  link?: string;
+  title?: string;
+  cover?: string;
+  description?: string;
+  host?: string;
+  author?: string;
+  authorLink?: string;
+  view?: string;
+  categoryList?: any[];
+}
 
 interface ListChapter {
   title: string;
@@ -33,7 +45,7 @@ interface ListChapter {
 
 interface Category {
   content: string;
-  host: string;
+  //host: string;
   href: string;
 }
 
@@ -52,7 +64,10 @@ interface DetailStory {
   detail: string;
   host: string;
 }
-
+interface changeDataSourceStory {
+  data: Story;
+  message: string;
+}
 interface ContentStory {
   name: string;
   title: string;
@@ -107,11 +122,96 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   public constructor(name: string) {
     this.name = name;
   }
-  changeDetailStoryToThisDataSource(title: string) {
-    throw new Error('Method not implemented.');
+  public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
+    try {
+      const data: object[] | null = await this.searchByTitle(title);
+      if (data === null || data.length <= 0) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+        return result;
+      } else {
+        const result: object = {
+          data: data ? data[0] : null,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
-  changeContentStoryToThisDataSource(title: string, chap?: string | undefined) {
-    throw new Error('Method not implemented.');
+  public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
+    if (!chap) chap = '1';
+    try {
+      const story: changeDataSourceStory | null =
+        await this.changeDetailStoryToThisDataSource(title);
+
+      const foundTitle: string | undefined =
+        story && story.data && story.message === 'found' ? story.data.title : undefined;
+
+      const checkedTitle: string = foundTitle ?? '';
+      if (!checkedTitle || checkedTitle === '') {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+
+      const chapterPaginationData: ListChapter = await this.chapterList(checkedTitle);
+      const chapNumber: number = Number.parseInt(chap);
+      if (chapNumber > chapterPaginationData.maxChapter) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      }
+
+      const detailChapter = await this.contentStory(checkedTitle, chap);
+
+      if (detailChapter === null) {
+        const result: object = {
+          data: null,
+          message: 'not found'
+        };
+
+        return result;
+      } else {
+        const result: object = {
+          data: detailChapter,
+          message: 'found'
+        };
+        return result;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  public async searchByTitle(title: string, page?: string): Promise<any> {
+    const searchString: string = `${this.getBaseUrl()}/vi/search?word=${title}`;
+    let result: Story[] | null = [];
+    try {
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
+      });
+      const html = await response.text();
+      result = this.getStoryMostLikeTitle(html, title);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return result;
   }
 
   getBaseUrl(): string {
@@ -146,7 +246,48 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     });
     return result;
   };
+  private getStoryMostLikeTitle = (html: string, searchedTitle: string) => {
+    const result: Story[] = [];
+    const $ = cheerio.load(html);
 
+    const elements = $('.recommend-comics .recommend-item');
+
+    if (elements.length === 0) {
+      return null;
+    }
+
+    $('.recommend-comics .recommend-item ').each((index, element) => {
+      if (result.length === 1) return;
+
+      const name = $(element).find('.recommend-comics-title').text().trim();
+      const link = $(element).find('a').attr('href') || '';
+      const cover = $(element).find('a .comics-image img').attr('data-src') || '';
+      const description = $(element).find('.comics-type span').text().trim();
+      const category = convertStringToCategoryList(description, '/');
+
+      const lowerCaseName: string = name.toLowerCase();
+      const lowerCaseTitle: string = searchedTitle.toLowerCase();
+      const found: boolean =
+        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+
+      if (found) {
+        const story: Story = {
+          name,
+          link,
+          cover,
+          description: description,
+          author: 'no information',
+          categoryList: category,
+          title: 'no information',
+          host: `${this.getBaseUrl()}`,
+          authorLink: 'no information',
+          view: 'no information'
+        };
+        result.push(story);
+      }
+    });
+    return result;
+  };
   private getDetailStory = (html: string) => {
     const result: DetailStory[] = [];
     const $ = cheerio.load(html);
@@ -218,7 +359,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       const href = $(element).attr('href') || '';
       result.push({
         content,
-        host: `${this.getBaseUrl()}`,
+       // host: `${this.getBaseUrl()}`,
         href
       });
     });
