@@ -14,6 +14,18 @@ interface ItemTruyenfull {
   category_ids: string;
   total_chapters: number;
 }
+interface DetailStory {
+  name: string;
+  link?: string;
+  title?: string;
+  cover?: string;
+  description?: string;
+  host?: string;
+  author?: string;
+  authorLink?: string;
+  detail?: string;
+  categoryList?: Category[];
+}
 interface APITruyenfullResponse {
   status: string;
   message: string;
@@ -98,7 +110,11 @@ interface StoryData {
   author?: string;
   authorLink?: string;
   view?: string;
-  categoryList?: any[];
+  categoryList?: Category[];
+}
+interface Category {
+  content: string | undefined;
+  href: string | undefined;
 }
 interface changeDataSourceStory {
   data: StoryData;
@@ -113,7 +129,16 @@ interface ChapterListTruyenfull {
   maxPage: number;
   chapterPerPage: number;
 }
-
+interface ContentStory {
+  name: string;
+  title?: string;
+  chapterTitle?: string;
+  chap?: string;
+  host?: string;
+  content?: string;
+  cover?: string;
+  author?: string;
+}
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';
@@ -205,18 +230,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       if (response.ok) {
         const json = await response.json();
         const dataArr: ItemTruyenfull[] = json.data;
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        const data: StoryData[] = [];
 
         if (dataArr.length <= 0) {
           return null;
@@ -242,7 +256,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           // console.log('title: ', lowerCaseTitle);
           const found: boolean =
             lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
-          console.log('found: ', found);
+          //console.log('found: ', found);
           if (found) {
             data.push({
               name,
@@ -281,18 +295,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       if (response.ok) {
         const json = await response.json();
         const dataArr: ItemTruyenfull[] = json.data;
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        const data: StoryData[] = [];
 
         dataArr.forEach((element: ItemTruyenfull) => {
           const name = element?.title;
@@ -335,11 +338,11 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     }
   }
 
-  private processCategoryList(category: string, category_ids: string): any {
+  private processCategoryList(category: string, category_ids: string): Category[] {
     const categories = category.split(','); // Split categories by comma
     const categoryIds = category_ids.split(','); // Split category_ids by comma
 
-    const result: { content: string; href: string }[] = [];
+    const result: Category[] = [];
 
     for (let i = 0; i < categories.length; i++) {
       const content: string = categories[i].trim(); // Remove whitespace around category
@@ -451,16 +454,16 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           dataResponse.categories,
           dataResponse.category_ids
         );
-        const data: object = {
+        const data: DetailStory = {
           name,
-          title,
           link,
+          title,
           cover,
+          description,
+          host,
           author,
           authorLink,
-          description,
           detail,
-          host,
           categoryList
         };
 
@@ -494,14 +497,15 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         title,
         pageNumber.toString()
       );
+
       if (chapterList === null) {
         console.log('ChapterList is null');
         return null;
       }
 
-      const countChapterInCurrentPage: number = chapterList.listChapter.length;
+      // const countChapterInCurrentPage: number = chapterList.listChapter.length;
 
-      console.log('countChapterInCurrentPage: ', countChapterInCurrentPage);
+      //console.log('countChapterInCurrentPage: ', countChapterInCurrentPage);
       if (
         !chapterList.listChapter[indexChapterInPage] ||
         chapterList.listChapter[indexChapterInPage] === null ||
@@ -509,6 +513,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       ) {
         return null;
       }
+
       const chapterId: string = chapterList.listChapter[indexChapterInPage].href;
       const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${chapterId}`;
 
@@ -541,7 +546,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const cover = dataResponse2.image;
         const author = dataResponse2.author;
 
-        const data: object = {
+        const data: ContentStory = {
           name,
           title,
           chapterTitle,
@@ -559,6 +564,40 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       return null;
     }
   }
+  private getListStory(dataArr: ItemTruyenfull[], limiter?: number): StoryData[] | null {
+    const data: StoryData[] | null = [];
+    dataArr.forEach((element: ItemTruyenfull) => {
+      if (limiter && data.length >= limiter) {
+        return;
+      }
+      const name = element?.title;
+      const link = this.convertToUnicodeAndCreateURL(element.title);
+      const title = element?.id.toString();
+
+      const cover = element.image;
+      const description = 'no information';
+      const host = this.getBaseUrl();
+      const author = element.author;
+      const authorLink = this.convertToUnicodeAndCreateURL(element.author);
+      const view = 'no information';
+      const categoryList = this.processCategoryList(element.categories, element.category_ids);
+
+      data.push({
+        name,
+        link,
+        title,
+        cover,
+        description,
+        host,
+        author,
+        authorLink,
+        view,
+        categoryList
+      });
+    });
+
+    return data;
+  }
   public async newestStory(limiter?: number, page?: string): Promise<any> {
     if (!page) page = '1';
     if (!limiter) limiter = Number.MAX_VALUE;
@@ -574,53 +613,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       if (response.ok) {
         const json = await response.json();
         const dataArr: ItemTruyenfull[] = json.data;
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
 
-        dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length >= limiter) {
-            return;
-          }
-          const name = element?.title;
-          const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id.toString();
-
-          const cover = element.image;
-          const description = 'no information';
-          const host = this.getBaseUrl();
-          const author = element.author;
-          const authorLink = this.convertToUnicodeAndCreateURL(element.author);
-          const view = 'no information';
-          const categoryList = this.processCategoryList(element.categories, element.category_ids);
-
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host,
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
-        });
         return data;
-
-        //return data;
       }
     } catch (error) {
       console.log(error);
@@ -643,53 +639,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       if (response.ok) {
         const json = await response.json();
         const dataArr: ItemTruyenfull[] = json.data;
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
 
-        dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length >= limiter) {
-            return;
-          }
-          const name = element?.title;
-          const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id.toString();
-
-          const cover = element.image;
-          const description = 'no information';
-          const host = this.getBaseUrl();
-          const author = element.author;
-          const authorLink = this.convertToUnicodeAndCreateURL(element.author);
-          const view = 'no information';
-          const categoryList = this.processCategoryList(element.categories, element.category_ids);
-
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host,
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
-        });
         return data;
-
-        //return data;
       }
     } catch (error) {
       console.log(error);
@@ -712,52 +665,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       if (response.ok) {
         const json = await response.json();
         const dataArr: ItemTruyenfull[] = json.data;
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
 
-        dataArr.forEach((element: ItemTruyenfull) => {
-          if (data.length >= limiter) {
-            return;
-          }
-          const name = element?.title;
-          const link = this.convertToUnicodeAndCreateURL(element.title);
-          const title = element?.id.toString();
-
-          const cover = element.image;
-          const description = 'no information';
-          const host = this.getBaseUrl();
-          const author = element.author;
-          const authorLink = this.convertToUnicodeAndCreateURL(element.author);
-          const view = 'no information';
-          const categoryList = this.processCategoryList(element.categories, element.category_ids);
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host,
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
-        });
         return data;
-
-        //return data;
       }
     } catch (error) {
       console.log(error);
@@ -795,21 +706,16 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
 
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          content: string | undefined;
-          href: string | undefined;
-         // host: string | undefined;
-        }[] = [];
+        const data: Category[] = [];
 
         const $ = cheerio.load(text);
         $('.dropdown-menu ul li a').each((index, element) => {
           const content = $(element).text().trim();
-          const href = $(element).attr('href'); //?.split('/').pop();
+          const href = $(element).attr('href');
 
           data.push({
             content,
-            href,
-           // host: this.getBaseUrl()
+            href
           });
         });
         //console.log(data)

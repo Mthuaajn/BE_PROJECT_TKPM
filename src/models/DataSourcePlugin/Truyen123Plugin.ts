@@ -660,7 +660,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             //host: this.getBaseUrl()
           });
         });
-        
+
         return data;
       }
     } catch (error) {
