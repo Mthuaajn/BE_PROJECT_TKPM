@@ -1,6 +1,8 @@
+import { IListStoryStrategy } from './IListStoryStrategy';
+
 export interface IDataSourcePlugin {
   name: string;
-
+  listStory: IListStoryStrategy;
   clone(name: string): IDataSourcePlugin;
   getBaseUrl(): string;
 
@@ -12,6 +14,7 @@ export interface IDataSourcePlugin {
   hotStory(limiter?: number, page?: string): any;
   categoryList(type?: string): any;
   chapterList(title: string, page?: string): any;
+  selectStoryList(type: string, limiter?: number, page?: string): any;
   home(): any;
   newestStoryAtCategory(category: string, limiter?: number, page?: string): any;
   fullStoryAtCategory(category: string, limiter?: number, page?: string): any;

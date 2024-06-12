@@ -82,18 +82,4 @@ export class FileExtensionFactory {
     }
     throw new Error(`Plugin not found: ${pluginName}`);
   }
-
-  private async loadPluginFromPath(pluginPath: string): Promise<IFileExtensionPlugin> {
-    const pluginName = path.basename(pluginPath);
-    const pluginFile = path.join(pluginPath, `${pluginName}.ts`);
-
-    if (fs.existsSync(pluginFile)) {
-      //const PluginClass = require(pluginFile).default;
-      const importedModule = await import(pluginFile);
-      const PluginClass = importedModule.default;
-      return new PluginClass();
-    }
-
-    throw new Error(`Plugin not found: ${pluginName}`);
-  }
 }

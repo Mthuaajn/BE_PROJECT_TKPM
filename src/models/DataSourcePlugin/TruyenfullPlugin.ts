@@ -3,6 +3,7 @@ import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import e from 'express';
 import { data } from 'node_modules/cheerio/lib/api/attributes';
+import { IListStoryStrategy } from '../DataSource/IListStoryStrategy';
 interface ItemTruyenfull {
   id: string;
   title: string;
@@ -142,8 +143,19 @@ interface ContentStory {
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';
+  listStory: IListStoryStrategy;
   public constructor(name: string) {
     this.name = name;
+    this.listStory = new TruyenfullListStoryStrategy(this.getBaseUrl());
+    console.log(this.listStory.getBaseUrl());
+  }
+
+  public async selectStoryList(
+    type: string,
+    limiter?: number | undefined,
+    page?: string | undefined
+  ): Promise<any> {
+    return this.listStory.select(type, limiter, page);
   }
 
   getBaseUrl(): string {
@@ -677,15 +689,17 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   }
   public async home(): Promise<any> {
     try {
-      const hot = await this.hotStory(12, '1');
-      const full = await this.fullStory(12, '1');
-      const newest = await this.newestStory(12, '1');
+      // const hot = await this.hotStory(12, '1');
+      // const full = await this.fullStory(12, '1');
+      // const newest = await this.newestStory(12, '1');
 
-      const data: object = {
-        hot,
-        newest,
-        full
-      };
+      // const data: object = {
+      //   hot,
+      //   newest,
+      //   full
+      // };
+      // return data;
+      const data = await this.listStory.home();
       return data;
     } catch (error) {
       console.log(error);
@@ -820,6 +834,216 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     return data;
   }
 }
+export class TruyenfullListStoryStrategy implements IListStoryStrategy {
+  name: string;
+  listStoryMap: Map<string, (limiter?: number, page?: string) => any>;
+  baseUrl: string = 'https://api.truyenfull.vn';
+  public constructor(url: string) {
+    this.baseUrl = url;
+    this.name = 'TruyenfullListStoryStrategy';
+    this.listStoryMap = new Map<string, (limiter?: number, page?: string) => any>();
+    this.register('newest', this.newestStory);
+    this.register('hot', this.hotStory);
+    this.register('full', this.fullStory);
+    this.register('update', this.updateStory);
+  }
+  getBaseUrl(): string {
+    return this.baseUrl;
+  }
+  private processCategoryList(category: string, category_ids: string): Category[] {
+    const categories = category.split(','); // Split categories by comma
+    const categoryIds = category_ids.split(','); // Split category_ids by comma
+
+    const result: Category[] = [];
+
+    for (let i = 0; i < categories.length; i++) {
+      const content: string = categories[i].trim(); // Remove whitespace around category
+      const href: string = categoryIds[i].trim(); // Convert category_id to number
+
+      result.push({ content, href });
+    }
+
+    return result;
+  }
+  private convertToUnicodeAndCreateURL(input: string): string {
+    // Convert ASCII string to Unicode string
+    const unicodeString = encodeURIComponent(input);
+
+    // Replace spaces with hyphens
+    const url = unicodeString.split(' ').join('-');
+
+    return url;
+  }
+  private getListStory(dataArr: ItemTruyenfull[], limiter?: number): StoryData[] | null {
+    const data: StoryData[] | null = [];
+    dataArr.forEach((element: ItemTruyenfull) => {
+      if (limiter && data.length >= limiter) {
+        return;
+      }
+      const name = element?.title;
+      const link = this.convertToUnicodeAndCreateURL(element.title);
+      const title = element?.id.toString();
+
+      const cover = element.image;
+      const description = 'no information';
+      const host = this.getBaseUrl();
+      const author = element.author;
+      const authorLink = this.convertToUnicodeAndCreateURL(element.author);
+      const view = 'no information';
+      const categoryList = this.processCategoryList(element.categories, element.category_ids);
+
+      data.push({
+        name,
+        link,
+        title,
+        cover,
+        description,
+        host,
+        author,
+        authorLink,
+        view,
+        categoryList
+      });
+    });
+
+    return data;
+  }
+  public newestStory = async (limiter?: number, page?: string): Promise<any> => {
+    if (!page) page = '1';
+    if (!limiter) limiter = Number.MAX_VALUE;
+    const searchString: string = `${this.getBaseUrl()}/v1/story/all?type=story_new&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const dataArr: ItemTruyenfull[] = json.data;
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
+
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+  public fullStory = async (limiter?: number, page?: string): Promise<any> => {
+    if (!page) page = '1';
+    if (!limiter) limiter = Number.MAX_VALUE;
+    const searchString: string = `${this.getBaseUrl()}/v1/story/all?type=story_full_rate&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const dataArr: ItemTruyenfull[] = json.data;
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
+
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+  public hotStory = async (limiter?: number, page?: string): Promise<any> => {
+    if (!page) page = '1';
+    if (!limiter) limiter = Number.MAX_VALUE;
+    const searchString: string = `${this.getBaseUrl()}/v1/story/all?type=story_full_view&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const dataArr: ItemTruyenfull[] = json.data;
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
+
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+  public updateStory = async (limiter?: number, page?: string): Promise<any> => {
+    if (!page) page = '1';
+    if (!limiter) limiter = Number.MAX_VALUE;
+    const searchString: string = `${this.getBaseUrl()}/v1/story/all?type=story_update&page=${page}`;
+    try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'PostmanRuntime/7.26.8'
+        }
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const dataArr: ItemTruyenfull[] = json.data;
+        let data: StoryData[] | null = [];
+        data = this.getListStory(dataArr, limiter);
+
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  public clone(): IListStoryStrategy {
+    return new TruyenfullListStoryStrategy(this.baseUrl);
+  }
+  public async select(type: string, limiter?: number, page?: string) {
+    const listFunction = this.listStoryMap.get(type);
+
+    if (listFunction) {
+      const result = listFunction(limiter, page);
+      return result;
+    } else {
+      return null;
+      // Handle the case when the function for the given type is not found
+    }
+  }
+  public register(name: string, listFunction: (limiter?: number, page?: string) => any) {
+    this.listStoryMap.set(name, listFunction);
+  }
+  public async home(): Promise<any> {
+    const hot = await this.hotStory(12, '1');
+    const full = await this.fullStory(12, '1');
+    const newest = await this.newestStory(12, '1');
+    const update = await this.updateStory(12, '1');
+    const data: object = {
+      hot,
+      newest,
+      full,
+      update
+    };
+    return data;
+  }
+}
 module.exports = {
-  plugin: TruyenfullPlugin
+  plugin: TruyenfullPlugin,
+  listStory: TruyenfullListStoryStrategy
 };

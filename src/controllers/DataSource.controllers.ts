@@ -101,15 +101,18 @@ export const listStory = wrapRequestHandler(
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         let result = null;
-        if (type === 'newest') {
-          result = await plugin.newestStory(undefined, page);
-        } else if (type === 'full') {
-          result = await plugin.fullStory(undefined, page);
-        } else if (type === 'hot') {
-          result = await plugin.hotStory(undefined, page);
-        } else {
-          res.json({ success: false, message: 'invalid type of list story' });
-        }
+        // if (type === 'newest') {
+        //   result = await plugin.newestStory(undefined, page);
+        // } else if (type === 'full') {
+        //   result = await plugin.fullStory(undefined, page);
+        // } else if (type === 'hot') {
+        //   result = await plugin.hotStory(undefined, page);
+        // } else {
+        //   res.json({ success: false, message: 'invalid type of list story' });
+        // }
+
+        result = await plugin.selectStoryList(type, undefined, page);
+
         if (result != null) {
           res.json(result);
         } else {
