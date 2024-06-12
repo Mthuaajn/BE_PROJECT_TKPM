@@ -10,9 +10,20 @@ interface StoryData {
   author?: string;
   authorLink?: string;
   view?: string;
-  categoryList?: any[];
+  categoryList?: Category[];
 }
-
+interface DetailStory {
+  name: string;
+  link?: string;
+  title?: string;
+  cover?: string;
+  description?: string;
+  host?: string;
+  author?: string;
+  authorLink?: string;
+  detail?: string;
+  categoryList?: Category[];
+}
 interface changeDataSourceStory {
   data: StoryData;
   message: string;
@@ -26,7 +37,20 @@ interface ChapterListTruyen123 {
   maxPage: number;
   chapterPerPage: number;
 }
-
+interface Category {
+  content: string | undefined;
+  href: string | undefined;
+}
+interface ContentStory {
+  name: string;
+  title?: string;
+  chapterTitle?: string;
+  chap?: string;
+  host?: string;
+  content?: string;
+  cover?: string;
+  author?: string;
+}
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://123truyen.info';
@@ -115,6 +139,69 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
+  private getStoryMostLikeTitle(html: string, title: string): StoryData[] | null {
+    const data: StoryData[] = [];
+
+    const $ = cheerio.load(html);
+    const elements = $('.list-new .row');
+
+    if (elements.length === 0) {
+      return null;
+    }
+
+    $('.list-new .row').each((index, element) => {
+      if (data.length === 1) {
+        return;
+      }
+      const name = $(element).find('.col-title h3').first().text().trim();
+      const link = $(element).find('a').first().attr('href');
+      const url = new URL(link ?? '');
+      const titleOfStory = url.pathname.substr(1);
+      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const description = $(element).find('.chapter-text').first().text();
+      const author = $(element)
+        .find('.col-author a')
+        .contents()
+        .filter(function () {
+          return this.nodeType === 3;
+        })
+        .text()
+        .trim();
+      const authorUrl = $(element).find('.col-author a').attr('href');
+      const authorLink = authorUrl?.split('/').pop();
+      const view = $(element).find('.col-view.show-view').text().trim();
+      const categoryList = $(element)
+        .find('.col-category a')
+        .map((_, childElement) => {
+          const content = $(childElement).text().trim();
+          const href = $(childElement).attr('href')?.split('/').pop();
+          return { content, href };
+        })
+        .get();
+
+      const lowerCaseName: string = name.toLowerCase();
+      const lowerCaseTitle: string = title.toLowerCase();
+      const found: boolean =
+        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+      //console.log('found in search by title: ', found);
+
+      if (found) {
+        data.push({
+          name,
+          link,
+          title: titleOfStory,
+          cover,
+          description,
+          host: this.getBaseUrl(),
+          author,
+          authorLink,
+          view,
+          categoryList
+        });
+      }
+    });
+    return data;
+  }
   public async searchByTitle(title: string, page?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/search?q=${encodeURIComponent(title)}&page=${page}`;
@@ -125,78 +212,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
-
-        const $ = cheerio.load(text);
-
-        const elements = $('.list-new .row');
-
-        if (elements.length === 0) {
-          return null;
-        }
-        $('.list-new .row').each((index, element) => {
-          if (data.length === 1) {
-            return;
-          }
-          const name = $(element).find('.col-title h3').first().text().trim();
-
-          const link = $(element).find('a').first().attr('href');
-          const url = new URL(link ?? '');
-          const titleOfStory = url.pathname.substr(1);
-          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
-          const description = $(element).find('.chapter-text').first().text();
-          const author = $(element)
-            .find('.col-author a')
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3;
-            })
-            .text()
-            .trim();
-          const authorUrl = $(element).find('.col-author a').attr('href');
-          const authorLink = authorUrl?.split('/').pop();
-          const view = $(element).find('.col-view.show-view').text().trim();
-          const categoryList = $(element)
-            .find('.col-category a')
-            .map((_, childElement) => {
-              const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href')?.split('/').pop();
-              return { content, href };
-            })
-            .get();
-
-          const lowerCaseName: string = name.toLowerCase();
-          const lowerCaseTitle: string = title.toLowerCase();
-          const found: boolean =
-            lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
-          //console.log('found in search by title: ', found);
-
-          if (found) {
-            data.push({
-              name,
-              link,
-              title: titleOfStory,
-              cover,
-              description,
-              host: this.getBaseUrl(),
-              author,
-              authorLink,
-              view,
-              categoryList
-            });
-          }
-        });
+        let data: StoryData[] | null = [];
+        data = this.getStoryMostLikeTitle(text, title);
 
         return data;
       }
@@ -205,10 +222,56 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
+  private getSearchedStory(html: string): StoryData[] | null {
+    const data: StoryData[] = [];
 
+    const $ = cheerio.load(html);
+    $('.list-new .row').each((index, element) => {
+      const name = $(element).find('.col-title h3').first().text().trim();
+      const link = $(element).find('a').first().attr('href');
+      const url = new URL(link ?? '');
+      const title = url.pathname.substr(1);
+      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const description = $(element).find('.chapter-text').first().text();
+      const author = $(element)
+        .find('.col-author a')
+        .contents()
+        .filter(function () {
+          return this.nodeType === 3;
+        })
+        .text()
+        .trim();
+      const authorUrl = $(element).find('.col-author a').attr('href');
+      const authorLink = authorUrl?.split('/').pop();
+      const view = $(element).find('.col-view.show-view').text().trim();
+      const categoryList = $(element)
+        .find('.col-category a')
+        .map((_, childElement) => {
+          const content = $(childElement).text().trim();
+          const href = $(childElement).attr('href')?.split('/').pop();
+          return { content, href };
+        })
+        .get();
+
+      data.push({
+        name,
+        link,
+        title,
+        cover,
+        description,
+        host: this.getBaseUrl(),
+        author,
+        authorLink,
+        view,
+        categoryList
+      });
+    });
+    return data;
+  }
   public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/search?q=${encodeURIComponent(title)}&page=${page}`;
+    let data: StoryData[] | null = [];
     try {
       console.log('searchString: ', searchString);
       const response = await fetch(searchString, {
@@ -216,68 +279,15 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        data = this.getSearchedStory(text);
+        if (data != null) {
+          if (category) {
+            const categoryData = data.filter((value) => {
+              return value.categoryList?.some((item) => item.content === category);
+            });
 
-        const $ = cheerio.load(text);
-        $('.list-new .row').each((index, element) => {
-          const name = $(element).find('.col-title h3').first().text().trim();
-
-          const link = $(element).find('a').first().attr('href');
-          const url = new URL(link ?? '');
-          const title = url.pathname.substr(1);
-          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
-          const description = $(element).find('.chapter-text').first().text();
-          const author = $(element)
-            .find('.col-author a')
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3;
-            })
-            .text()
-            .trim();
-          const authorUrl = $(element).find('.col-author a').attr('href');
-          const authorLink = authorUrl?.split('/').pop();
-          const view = $(element).find('.col-view.show-view').text().trim();
-          const categoryList = $(element)
-            .find('.col-category a')
-            .map((_, childElement) => {
-              const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href')?.split('/').pop();
-              return { content, href };
-            })
-            .get();
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host: this.getBaseUrl(),
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
-        });
-        if (category) {
-          const categoryData = data.filter((value) => {
-            return value.categoryList?.some((item) => item.content === category);
-          });
-
-          return categoryData;
+            return categoryData;
+          }
         }
         return data;
       }
@@ -400,32 +410,24 @@ export class Truyen123Plugin implements IDataSourcePlugin {
             return { content, href };
           })
           .get();
-        // const author = (
-        //   $('.wrapper').find('.container .info > div > div ').get(0) as unknown as HTMLElement
-        // )?.textContent?.toString();
         const description = $('.wrapper').find('.desc-text').text().trim().replaceAll('<br>', ' '); //.find('br').text();
         const detail = $('.wrapper').find('.info .label').text();
         const host = this.getBaseUrl();
         const link = searchString;
-        const maxChapterDiv = $('.wrapper').find('.l-chapter .l-chapters li a span').first();
 
-        const data: object = {
+        const data: DetailStory = {
           name,
-          title,
           link,
+          title,
           cover,
+          description,
+          host,
           author,
           authorLink,
-          description,
           detail,
-          host,
-          // maxChapter,
-          // listChapter,
-          // chapterPagination,
           categoryList
         };
 
-        //console.log(data)
         return data;
       }
     } catch (error) {
@@ -469,7 +471,6 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const chapterTitle = $('.wrapper').find('div.chapter-title').text().trim();
         $('.wrapper').find('.chapter-content div').remove();
         let content = $('.wrapper').find('div.chapter-content').html() ?? '';
-        // console.log('content: ', content);
         content = content.replace(/<!-- (.*?) -->/gm, '');
         //content = content.replace(/<p(.*?)>(.*?)<?p>/g, '');
         content = content.replace(/<span(.*?)>(.*?)<?span>/g, '');
@@ -485,7 +486,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const cover = $2('.wrapper').find('.book img').first().attr('src');
         const author = $2('.wrapper').find('.info').find('[itemprop="author"]').text();
 
-        const data: object = {
+        const data: ContentStory = {
           name,
           title,
           chapterTitle,
@@ -503,6 +504,55 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
+  private getListStory(html: string, limiter?: number): StoryData[] | null {
+    const data: StoryData[] | null = [];
+    const $ = cheerio.load(html);
+    $('.list-new .row').each((index, element) => {
+      if (limiter && index >= limiter) {
+        return;
+      }
+      const name = $(element).find('.col-title h3').first().text().trim();
+
+      const link = $(element).find('a').first().attr('href');
+      const url = new URL(link ?? '');
+      const title = url.pathname.substr(1);
+      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const description = $(element).find('.chapter-text').first().text();
+      const author = $(element)
+        .find('.col-author a')
+        .contents()
+        .filter(function () {
+          return this.nodeType === 3;
+        })
+        .text()
+        .trim();
+      const authorUrl = $(element).find('.col-author a').attr('href');
+      const authorLink = authorUrl?.split('/').pop();
+      const view = $(element).find('.col-view.show-view').text().trim();
+      const categoryList = $(element)
+        .find('.col-category a')
+        .map((_, childElement) => {
+          const content = $(childElement).text().trim();
+          const href = $(childElement).attr('href')?.split('/').pop();
+          return { content, href };
+        })
+        .get();
+      data.push({
+        name,
+        link,
+        title,
+        cover,
+        description,
+        host: this.getBaseUrl(),
+        author,
+        authorLink,
+        view,
+        categoryList
+      });
+    });
+
+    return data;
+  }
   public async newestStory(limiter?: number, page?: string): Promise<any> {
     if (!page) page = '1';
     if (!limiter) limiter = Number.MAX_VALUE;
@@ -514,65 +564,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(text, limiter);
 
-        const $ = cheerio.load(text);
-        $('.list-new .row').each((index, element) => {
-          if (limiter && index >= limiter) {
-            return;
-          }
-          const name = $(element).find('.col-title h3').first().text().trim();
-
-          const link = $(element).find('a').first().attr('href');
-          const url = new URL(link ?? '');
-          const title = url.pathname.substr(1);
-          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
-          const description = $(element).find('.chapter-text').first().text();
-          const author = $(element)
-            .find('.col-author a')
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3;
-            })
-            .text()
-            .trim();
-          const authorUrl = $(element).find('.col-author a').attr('href');
-          const authorLink = authorUrl?.split('/').pop();
-          const view = $(element).find('.col-view.show-view').text().trim();
-          const categoryList = $(element)
-            .find('.col-category a')
-            .map((_, childElement) => {
-              const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href')?.split('/').pop();
-              return { content, href };
-            })
-            .get();
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host: this.getBaseUrl(),
-            author,
-            authorLink,
-
-            view,
-            categoryList
-          });
-        });
-        //console.log(data)
         return data;
       }
     } catch (error) {
@@ -591,65 +585,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(text, limiter);
 
-        const $ = cheerio.load(text);
-        $('.list-new .row').each((index, element) => {
-          if (index >= limiter) {
-            return;
-          }
-          const name = $(element).find('.col-title h3').first().text().trim();
-
-          const link = $(element).find('a').first().attr('href');
-          const url = new URL(link ?? '');
-          const title = url.pathname.substr(1);
-          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
-          const description = $(element).find('.chapter-text').first().text();
-          const author = $(element)
-            .find('.col-author a')
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3;
-            })
-            .text()
-            .trim();
-          const authorUrl = $(element).find('.col-author a').attr('href');
-          const authorLink = authorUrl?.split('/').pop();
-          const view = $(element).find('.col-view.show-view').text().trim();
-          const categoryList = $(element)
-            .find('.col-category a')
-            .map((_, childElement) => {
-              const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href')?.split('/').pop();
-              return { content, href };
-            })
-            .get();
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host: this.getBaseUrl(),
-            author,
-            authorLink,
-
-            view,
-            categoryList
-          });
-        });
-        //console.log(data)
         return data;
       }
     } catch (error) {
@@ -668,66 +606,9 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          name: string;
-          link: string | undefined;
-          title: string | undefined;
-          cover: string | undefined;
-          description: string | undefined;
-          host: string | undefined;
-          author: string | undefined;
-          authorLink: string | undefined;
-          view: string | undefined;
-          categoryList: any[] | undefined;
-        }[] = [];
+        let data: StoryData[] | null = [];
+        data = this.getListStory(text, limiter);
 
-        const $ = cheerio.load(text);
-        $('.list-new .row').each((index, element) => {
-          if (index >= limiter) {
-            return;
-          }
-          const name = $(element).find('.col-title h3').first().text().trim();
-
-          const link = $(element).find('a').first().attr('href');
-          const url = new URL(link ?? '');
-          const title = url.pathname.substr(1);
-          const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
-          const description = $(element).find('.chapter-text').first().text();
-          const author = $(element)
-            .find('.col-author a')
-            .contents()
-            .filter(function () {
-              return this.nodeType === 3;
-            })
-            .text()
-            .trim();
-          const authorUrl = $(element).find('.col-author a').attr('href');
-          const authorLink = authorUrl?.split('/').pop();
-          const view = $(element).find('.col-view.show-view').text().trim();
-          const categoryList = $(element)
-            .find('.col-category a')
-            .map((_, childElement) => {
-              const content = $(childElement).text().trim();
-              const href = $(childElement).attr('href')?.split('/').pop();
-              return { content, href };
-            })
-            .get();
-          data.push({
-            name,
-            link,
-            title,
-            cover,
-            description,
-            host: this.getBaseUrl(),
-            author,
-            authorLink,
-            //   view: undefined,
-            //   categoryList: undefined,
-            view,
-            categoryList
-          });
-        });
-        //console.log(data)
         return data;
       }
     } catch (error) {
@@ -763,11 +644,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
       if (response.ok) {
         const text = await response.text();
-        const data: {
-          content: string | undefined;
-          href: string | undefined;
-          host: string | undefined;
-        }[] = [];
+        const data: Category[] = [];
 
         const $ = cheerio.load(text);
         $('.list-cat-inner a').each((index, element) => {
@@ -779,11 +656,11 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
           data.push({
             content,
-            href,
-            host: this.getBaseUrl()
+            href
+            //host: this.getBaseUrl()
           });
         });
-        //console.log(data)
+        
         return data;
       }
     } catch (error) {

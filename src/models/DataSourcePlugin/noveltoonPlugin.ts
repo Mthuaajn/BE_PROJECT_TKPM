@@ -359,7 +359,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       const href = $(element).attr('href') || '';
       result.push({
         content,
-       // host: `${this.getBaseUrl()}`,
+        // host: `${this.getBaseUrl()}`,
         href
       });
     });
