@@ -279,7 +279,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     return result;
   };
 
-  private getDetailStory = (html: string) => {
+  private getDetailStory = (html: string, title: string) => {
     const result: DetailStory[] = [];
     const $ = cheerio.load(html);
     const $$ = $('.detail-top .detail-top-mask');
@@ -301,7 +301,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       .filter((index, el) => el.content.toLocaleLowerCase() !== 'đã full');
     const story: DetailStory = {
       name,
-      title: 'no information',
+      title,
       cover,
       description,
       categoryList: listCategory.get(),
@@ -594,7 +594,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         }
       });
       const html = await response.text();
-      result = this.getDetailStory(html);
+      result = this.getDetailStory(html, title);
       return result;
     } catch (err) {
       console.log(err);

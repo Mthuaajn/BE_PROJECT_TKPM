@@ -9,6 +9,7 @@ import { IFileExtensionPlugin } from '~/models/FileExtension/IFileExtensionPlugi
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
 import { deleteFile } from '~/utils/FileUtility';
+import { removeInvalidCharacter } from '~/utils/StringUtility';
 interface contentStoryAPI {
   name: string;
   title: string;
@@ -18,10 +19,7 @@ interface contentStoryAPI {
   content: string;
 }
 const upload = multer();
-export const removeInvalidCharacter = (inputString: string): string => {
-  const sanitizedString = inputString.replace(/[<>:"/|?]/g, '');
-  return sanitizedString;
-};
+
 
 export const downloadChapter = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {

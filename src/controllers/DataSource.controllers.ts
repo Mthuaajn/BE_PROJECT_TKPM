@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
+import { removeInvalidCharacter } from '~/utils/StringUtility';
 export const search = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const search: string = req.query.search?.toString() || '';
