@@ -61,7 +61,7 @@ interface ContentStory {
   content: string;
   author: string;
   cover: string;
-  hot: string;
+  host: string;
 }
 
 function removeVietnameseAccents(str: string): string {
@@ -267,7 +267,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         .join('\n');
     }
 
-    const hot = `${this.getBaseUrl()}`;
+    const host = `${this.getBaseUrl()}`;
     const story = {
       name,
       chapterTitle,
@@ -275,7 +275,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       title: 'no information',
       author: 'no information',
       content,
-      hot,
+      host,
       cover: 'no information'
     };
     // console.log('story: ', story);
