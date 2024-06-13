@@ -147,7 +147,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   public constructor(name: string) {
     this.name = name;
     this.listStory = new TruyenfullListStoryStrategy(this.getBaseUrl());
-    console.log(this.listStory.getBaseUrl());
+    //console.log(this.listStory.getBaseUrl());
   }
 
   public async selectStoryList(
