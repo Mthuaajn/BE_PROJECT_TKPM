@@ -81,8 +81,26 @@ function convertString(input: string): string {
 
   // Thay thế các dấu cách bằng dấu gạch ngang
   const kebabCaseStr = noAccentsStr.split(' ').join('-');
-
   return kebabCaseStr;
+}
+
+function cutStringTitle(input: string): string {
+  const result = input.split('/vi/');
+  return result[1];
+}
+
+function findNumberFromString(input: string): boolean {
+  const regex = /\d+/g;
+  const matches = input.match(regex);
+  if (matches === null) {
+    return false;
+  }
+  return true;
+}
+
+function findContent_id(input: string): string {
+  const result = input.split('?')[1].split('=')[1];
+  return result;
 }
 
 function convertStringToCategoryList(
@@ -124,6 +142,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       const cover = $(element).find('a .comics-image img').attr('data-src') || '';
       const description = $(element).find('.comics-type span').text().trim();
       const category = convertStringToCategoryList(description, '/');
+      const title = cutStringTitle(link);
       const story: Story = {
         name,
         link,
@@ -131,7 +150,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         description: description,
         author: 'no information',
         categoryList: category,
-        title: 'no information',
+        title,
         host: `${this.getBaseUrl()}`,
         authorLink: 'no information',
         view: 'no information'
@@ -146,9 +165,10 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     const $ = cheerio.load(html);
     const $$ = $('.detail-top .detail-top-mask');
     const name = $$.find('.detail-top-title h1.detail-title').text().trim();
-    const author = $$.find('.detail-author.app-author.select-text').text().trim();
+    const author = $$.find('.detail-author.web-author').text().trim();
     const cover = $$.find('.detail-top-right img').attr('src') || '';
     const description = $$.find('.detail-desc p.detail-desc-info').text().trim();
+    const authorLink = convertString(author);
     const listCategory = $('.detail-tag-content .detail-tag-item')
       .map((index, element): { content: string; href: string } => {
         const content = $(element).find('a span').text().trim();
@@ -170,7 +190,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       host: `${this.getBaseUrl()}`,
       detail: 'full',
       author,
-      authorLink: 'no information'
+      authorLink
     };
     return story;
   };
@@ -185,6 +205,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       const cover = $(element).find('.genre-item-image img').attr('src') || '';
       const description = $(element).find('.genre-item-label').text().trim();
       const category = convertStringToCategoryList(description, '|');
+      const title = cutStringTitle(link);
       const story: Story = {
         name,
         link,
@@ -192,7 +213,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         description: description,
         author: 'no information',
         categoryList: category,
-        title: 'no information',
+        title,
         host: `${this.getBaseUrl()}`,
         authorLink: 'no information',
         view: 'no information'
@@ -418,8 +439,12 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   public async contentStory(title: string, chap?: string): Promise<any> {
     // const searchString: string = `${this.getBaseUrl()}/doc-truyen/${title}/chuong-${chap}`;
     let result: ContentStory;
+    const resultDetailStory = await this.detailStory(title);
+    const tempTitle = title;
+    title = resultDetailStory.name;
     try {
-      const content_id = (await this.search(title))[0].link.split('?')[1].split('=')[1];
+      console.log('title sau khi decode: ', title);
+      const content_id = findContent_id((await this.search(title))[0].link);
       console.log('content_id: ', content_id);
       const chapter = (await this.chapterList(title, '0')).listChapter[Number(chap) - 1].href;
       console.log('chapter: ', chapter);
@@ -443,7 +468,12 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    return {
+      ...result,
+      title: tempTitle,
+      author: resultDetailStory.author,
+      cover: resultDetailStory.cover
+    };
   }
   public async chapterList(title: string, page?: string): Promise<any> {
     let result: ListChapter;
@@ -451,7 +481,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       const resultSearch = await this.search(title);
       if (resultSearch.length === 0) return null;
       const searchString = resultSearch[0].link;
-
+      console.log('list chapter" ', searchString);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
@@ -468,10 +498,11 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     return result;
   }
   public async detailStory(title: string): Promise<any> {
-    const resultSearch = await this.search(title);
-    if (resultSearch.length === 0) return null;
-    const searchString = resultSearch[0].link;
-    // const searchString: string = `${this.getBaseUrl()}/vi/${title}?content_id=${content_id || 0}`;
+    // const resultSearch = await this.search(title);
+    // if (resultSearch.length === 0) return null;
+    // const searchString = resultSearch[0].link;
+    const searchString: string = `${this.getBaseUrl()}/vi/${title}`;
+    console.log('searchString: ', searchString);
     let result: DetailStory;
     try {
       const response = await fetch(searchString, {
@@ -486,7 +517,29 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    const StorySearch = await this.search(result.name);
+    let story: Story = {
+      author: 'no information',
+      authorLink: 'no information',
+      categoryList: [],
+      cover: 'no information',
+      description: 'no information',
+      host: 'no information',
+      link: 'no information',
+      name: 'no information',
+      title: 'no information',
+      view: 'no information'
+    };
+    StorySearch.forEach((el: Story) => {
+      if (el.name === result.name) {
+        story = el;
+      }
+    });
+    return {
+      ...result,
+      title: cutStringTitle(searchString),
+      link: StorySearch[0].link
+    };
   }
   private async getCtg(category: string): Promise<number> {
     const listCategory = await this.categoryList();
