@@ -174,7 +174,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         story && story.data && story.message === 'found' ? story.data.title : undefined;
 
       //console.log('story: ', story);
-      console.log('foundTitle: ', foundTitle);
+      //console.log('foundTitle: ', foundTitle);
       const checkedTitle: string = foundTitle ?? '';
       if (!checkedTitle || checkedTitle === '') {
         const result: object = {

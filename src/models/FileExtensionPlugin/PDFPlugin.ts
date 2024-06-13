@@ -11,7 +11,7 @@ export class PDFPlugin implements IFileExtensionPlugin {
   public constructor() {
     this.name = 'PDFPlugin';
   }
-
+ 
   clone(): IFileExtensionPlugin {
     return new PDFPlugin();
   }
