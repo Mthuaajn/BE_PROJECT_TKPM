@@ -157,9 +157,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         author,
         categoryList: [].concat(category) as { content: string; href: string }[],
         link,
-        title: 'no information',
+        title: link,
         host: 'https://truyen.tangthuvien.vn/',
-        authorLink: 'no information',
+        authorLink: convertString(author),
         view: 'no information'
       };
       result.push(story);
@@ -419,7 +419,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       console.log(err);
       return null;
     }
-    return result;
+    return { ...result, title: title };
   }
   private async getCtg(category: string): Promise<number> {
     const listCategory = await this.categoryList();
