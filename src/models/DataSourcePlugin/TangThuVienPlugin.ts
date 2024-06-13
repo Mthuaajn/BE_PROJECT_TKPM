@@ -108,7 +108,7 @@ interface changeDataSourceStory {
 }
 export class TangThuVienPlugin implements IDataSourcePlugin {
   name: string;
-  static baseUrl: string = 'https://truyen.tangthuvien.vn/';
+  static baseUrl: string = 'https://truyen.tangthuvien.vn';
   listStory: IListStoryStrategy;
   public constructor(name: string) {
     this.name = name;
@@ -607,6 +607,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         maxPage: data.maxPage,
         chapterPerPage: data.chapterPerPage
       };
+      //console.log('result: ', result);
       return result;
     } catch (err) {
       console.log(err);
@@ -645,7 +646,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
         let content = $(element).find('a span.chapter-text').text();
         content = he.decode(content);
 
-        chapters.push({ content, href });
+        if (content && content.length >= 0 && href != undefined && href.length >= 0) {
+          chapters.push({ content, href });
+        }
       });
 
       const ul = $('ul.pagination');
@@ -760,7 +763,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
 export class TangThuVienListStoryStrategy implements IListStoryStrategy {
   name: string;
   listStoryMap: Map<string, (limiter?: number, page?: string) => any>;
-  baseUrl: string = 'https://truyen.tangthuvien.vn/';
+  baseUrl: string = 'https://truyen.tangthuvien.vn';
   public constructor(url: string) {
     this.baseUrl = url;
     this.name = 'TangThuVienListStoryStrategy';
