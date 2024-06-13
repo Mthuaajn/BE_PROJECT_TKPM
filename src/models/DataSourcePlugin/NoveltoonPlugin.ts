@@ -31,7 +31,14 @@ interface ListChapter {
   maxPage: number;
   chapterPerPage: number;
 }
-
+interface partialContentStory {
+  name: string;
+  chapterTitle: string;
+  chap: string;
+  author: string;
+  content: string;
+  host: string;
+}
 interface Category {
   content: string;
   href: string;
@@ -351,16 +358,14 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         .join('\n');
     }
 
-    const host = `${this.getBaseUrl()}`;
+    const host = this.getBaseUrl();
     const story = {
       name,
       chapterTitle,
       chap,
-      title: 'no information',
       author: 'no information',
       content,
-      host,
-      cover: 'no information'
+      host
     };
     // console.log('story: ', story);
     return story;
@@ -491,6 +496,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     let result: ContentStory;
     //const resultDetailStory = await this.detailStory(title);
     const tempTitle = title;
+    let data: partialContentStory;
     // title = resultDetailStory.name;
     // console.log('title sau khi decode: ', resultDetailStory.name);
     if (!chap) chap = '1';
@@ -526,11 +532,16 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         }
       });
       const html = await response.text();
-      result = this.getContentStory(html, chap as string);
+      data = this.getContentStory(html, chap as string);
       result = {
-        ...result,
         author: detailStory.author,
-        cover: detailStory.cover
+        cover: detailStory.cover,
+        name: data.name,
+        title,
+        chap: data.chap,
+        chapterTitle: data.chapterTitle,
+        content: data.content,
+        host: data.host
       };
       // console.log('result: ', result);
       return result;

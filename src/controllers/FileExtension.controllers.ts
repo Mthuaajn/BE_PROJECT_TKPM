@@ -18,10 +18,15 @@ interface contentStoryAPI {
   content: string;
 }
 const upload = multer();
+export const removeInvalidCharacter = (inputString: string): string => {
+  const sanitizedString = inputString.replace(/[<>:"/|?]/g, '');
+  return sanitizedString;
+};
+
 export const downloadChapter = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const chap: string = req.query.chap?.toString() || '';
-    const title: string = req.query.title?.toString() || '';
+    let title: string = req.query.title?.toString() || '';
     const source: string = req.query.datasource?.toString() || '';
     const fileExtensionType = req.query.type?.toString() || '';
     console.log('source: ', source);
@@ -34,8 +39,11 @@ export const downloadChapter = wrapRequestHandler(
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
         const result: contentStoryAPI | null = await plugin.contentStory(title, chap);
-        console.log(result);
+        // console.log('result in controller: ', result);
         if (result != null) {
+          //result.chap = removeInvalidCharacter(result.chap);
+          title = removeInvalidCharacter(title);
+          //console.log('result in controller: ', result);
           const fileExtensionManager: FileExtensionManager = FileExtensionManager.getInstance();
           const fileExtensionPlugin: IFileExtensionPlugin | null = fileExtensionManager.select(
             `${fileExtensionType}Plugin`
@@ -49,6 +57,7 @@ export const downloadChapter = wrapRequestHandler(
               result.content,
               result.chapterTitle ? result.chapterTitle : ''
             );
+
             const fileTxtPath = await fileTxtExtensionPlugin.createFile(
               title,
               chap,
