@@ -439,10 +439,10 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   public async contentStory(title: string, chap?: string): Promise<any> {
     // const searchString: string = `${this.getBaseUrl()}/doc-truyen/${title}/chuong-${chap}`;
     let result: ContentStory;
-    const resultDetailStory = await this.detailStory(title);
+    //const resultDetailStory = await this.detailStory(title);
     const tempTitle = title;
-    title = resultDetailStory.name;
-    console.log('title sau khi decode: ', title);
+   // title = resultDetailStory.name;
+   // console.log('title sau khi decode: ', resultDetailStory.name);
     try {
       const content_id = findContent_id(tempTitle);
       console.log('content_id: ', content_id);
@@ -464,16 +464,17 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         author: detailStory.author,
         cover: detailStory.cover
       };
+      return result;
     } catch (err) {
       console.log(err);
       return null;
     }
-    return {
-      ...result,
-      title: tempTitle,
-      author: resultDetailStory.author,
-      cover: resultDetailStory.cover
-    };
+    // return {
+    //   ...result,
+    //   title: tempTitle,
+    //   author: resultDetailStory.author,
+    //   cover: resultDetailStory.cover
+    // };
   }
   public async chapterList(title: string, page?: string): Promise<any> {
     let result: ListChapter;
