@@ -366,7 +366,6 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     return story;
   };
 
-
   private getListChapterStory = (html: string, chapter: string, url: string) => {
     const $ = cheerio.load(html);
 
