@@ -250,7 +250,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
       .trim();
     let content;
     const temp = $('.watch-main').find('.chart-story .row');
-    if (temp) {
+    if (temp.length > 0) {
       content = temp
         .map((index, el) => {
           return $(el).text().trim();
@@ -446,7 +446,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     try {
       const content_id = findContent_id(tempTitle);
       console.log('content_id: ', content_id);
-      const chapter = (await this.chapterList(title, '0')).listChapter[Number(chap) - 1].href;
+      const chapter = (await this.chapterList(tempTitle, '0')).listChapter[Number(chap) - 1].href;
       console.log('chapter: ', chapter);
       const searchString = `${this.getBaseUrl()}/vi/watch/${content_id}/${chapter}`;
       console.log('searchString: ', searchString);
