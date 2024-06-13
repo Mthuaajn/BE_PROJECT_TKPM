@@ -200,10 +200,10 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     }
   }
 
-  getBaseUrl(): string {
+  public getBaseUrl(): string {
     return NoveltoonPlugin.baseUrl;
   }
-  clone(name: string): IDataSourcePlugin {
+  public clone(name: string): IDataSourcePlugin {
     return new NoveltoonPlugin(name);
   }
 
@@ -310,34 +310,6 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     return story;
   };
 
-  private getStory = (html: string, limiter?: number) => {
-    const result: Story[] = [];
-    const $ = cheerio.load(html);
-    $('.genre-content a.genre-item-box').each((index, element) => {
-      if (limiter && index >= limiter) return;
-      const name = $(element).find('.genre-item-info p.genre-item-title').text().trim();
-      const link = $(element).attr('href') || '';
-      const cover = $(element).find('.genre-item-image img').attr('src') || '';
-      const description = $(element).find('.genre-item-label').text().trim();
-      const category = convertStringToCategoryList(description, '|');
-      const title = cutStringTitle(link);
-      const story: Story = {
-        name,
-        link,
-        cover,
-        description: description,
-        author: 'no information',
-        categoryList: category,
-        title,
-        host: `${this.getBaseUrl()}`,
-        authorLink: 'no information',
-        view: 'no information'
-      };
-      result.push(story);
-    });
-    return result;
-  };
-
   private getCategoryList = (html: string) => {
     const $ = cheerio.load(html);
     const result: Category[] = [];
@@ -433,8 +405,6 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     return result;
   };
 
-  private getNewestStoryAtCategory = (html: string, limiter?: number) => {};
-
   private getNumberValueFromString(input: string): any {}
   public async getMaxChapterPage(title: string): Promise<any> {}
   public async searchByTitle(title: string, page?: string): Promise<any> {
@@ -480,60 +450,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     }
     return result;
   }
-  async newestStory(limiter?: number, page?: string): Promise<any> {
-    const searchString = `${this.getBaseUrl()}//vi/genre/2/0/1?page=${page || 0}`;
-    let result: Story[];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
-  async fullStory(limiter?: number, page?: string): Promise<any> {
-    const searchString = `${this.getBaseUrl()}//vi/genre/2/0/2?page=${page || 0}`;
-    let result: Story[] = [];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
-  async hotStory(limiter?: number, page?: string): Promise<any> {
-    const searchString = `${this.getBaseUrl()}//vi/genre/2/0/0?page=${page || 0}`;
-    let result: Story[] = [];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
+
   async categoryList(): Promise<Category[]> {
     let result: Category[] = [];
     try {
@@ -618,7 +535,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
         author: detailStory.author,
         cover: detailStory.cover
       };
-     // console.log('result: ', result);
+      // console.log('result: ', result);
       return result;
     } catch (err) {
       console.log(err);

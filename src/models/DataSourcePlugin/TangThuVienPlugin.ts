@@ -214,10 +214,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     }
   }
 
-  getBaseUrl(): string {
+  public getBaseUrl(): string {
     return TangThuVienPlugin.baseUrl;
   }
-  clone(name: string): IDataSourcePlugin {
+  public clone(name: string): IDataSourcePlugin {
     return new TangThuVienPlugin(name);
   }
 
@@ -394,43 +394,6 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return story;
   };
 
-  private getListChapterStory = (html: string, page: string, url: string) => {
-    const $ = cheerio.load(html);
-    const totalChapterText = $('#j-bookCatalogPage').text().trim();
-    const totalChapterMatch = totalChapterText.match(/\((\d+) chương\)/);
-    const maxChapter = totalChapterMatch ? parseInt(totalChapterMatch[1], 10) : 0;
-    const title = $('.book-info h1').text().trim();
-    const host = url;
-    const currentPage = Number(page) || 1;
-    const listChapter: Array<{ content: string; href: string }> = [];
-    $('.volume-wrap #max-volume .cf li ').each((index, element) => {
-      const content = $(element).find('a').attr('title')?.toString() || '';
-      const href = $(element).find('a').attr('href') || '';
-      listChapter.push({
-        content,
-        href
-      });
-    });
-    const chapterPerPage = listChapter.length - 1;
-    const maxPage = Math.ceil(maxChapter / listChapter.length);
-
-    const result: ListChapter = {
-      title,
-      host,
-      maxChapter,
-      listChapter,
-      currentPage,
-      maxPage,
-      chapterPerPage
-    };
-    return result;
-  };
-
-  private getNewestStoryAtCategory = (html: string, limiter?: number) => {
-    const result = this.getStory(html, limiter);
-    return result;
-  };
-
   private getNumberValueFromString(input: string): any {}
   public async getMaxChapterPage(title: string): Promise<any> {}
   public async search(title: string, page?: string, category?: string): Promise<any> {
@@ -458,60 +421,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     }
     return result;
   }
-  async newestStory(limiter?: number, page?: string): Promise<any> {
-    const searchString: string = `${this.getBaseUrl()}/tong-hop?ord=new&page=${page}`;
-    let result: Story[];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
-  async fullStory(limiter?: number, page?: string): Promise<any> {
-    const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=nm&page=${page}`;
-    let result: Story[] = [];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
-  async hotStory(limiter?: number, page?: string): Promise<any> {
-    const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=vw&page=${page}`;
-    let result: Story[] = [];
-    try {
-      const response = await fetch(searchString, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'PostmanRuntime/7.39.0'
-        }
-      });
-      const html = await response.text();
-      result = this.getStory(html, limiter as number);
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-    return result;
-  }
+
   async categoryList(): Promise<any> {
     let result: Category[] = [];
     try {
@@ -772,6 +682,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     this.register('newest', this.newestStory);
     this.register('hot', this.hotStory);
     this.register('full', this.fullStory);
+    this.register('most view', this.mostViewStory);
   }
   getBaseUrl(): string {
     return this.baseUrl;
@@ -834,6 +745,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?ord=new&page=${page}`;
     let result: Story[];
     try {
+      console.log('searchString: ', searchString);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
@@ -852,6 +764,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=nm&page=${page}`;
     let result: Story[] = [];
     try {
+      console.log('searchString: ', searchString);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
@@ -870,6 +783,26 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=vw&page=${page}`;
     let result: Story[] = [];
     try {
+      console.log('searchString: ', searchString);
+      const response = await fetch(searchString, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'PostmanRuntime/7.39.0'
+        }
+      });
+      const html = await response.text();
+      result = this.getStory(html, limiter as number);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    return result;
+  };
+  public mostViewStory = async (limiter?: number, page?: string): Promise<any> => {
+    const searchString: string = `${this.getBaseUrl()}/tong-hop?rank=td&page=${page}`;
+    let result: Story[] = [];
+    try {
+      console.log('searchString: ', searchString);
       const response = await fetch(searchString, {
         method: 'GET',
         headers: {
@@ -889,11 +822,12 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     const hot = await this.hotStory(12, '1');
     const full = await this.fullStory(12, '1');
     const newest = await this.newestStory(12, '1');
-
+    const mostView = await this.mostViewStory(12, '1');
     const data: object = {
       hot,
       newest,
-      full
+      full,
+      'most view': mostView
     };
     return data;
   }
