@@ -1,71 +1,16 @@
 import { IDataSourcePlugin } from '../DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
+import { Category } from '../Interfaces/Category';
+import { DetailStory } from '../Interfaces/DetailStory';
+import { Story } from '../Interfaces/Story';
+import { ChapterItem } from '../Interfaces/ChapterItem';
+import { ContentStory } from '../Interfaces/ContentStory';
+import { ListChapter } from '../Interfaces/ListChapter';
+import { PartialChapterPagination } from '../Interfaces/PartialChapterPagination';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const he = require('he');
-export interface Category {
-  content: string;
-  // host: string;
-  href: string;
-}
-export interface PartialChapterPagination {
-  chapters: chapterItem[];
-  maxPage: number;
-  chapterPerPage: number;
-}
-export interface Story {
-  name: string;
-  link: string;
-  title: string;
-  cover: string;
-  description: string;
-  author: string;
-  categoryList: {
-    content: string;
-    href: string;
-  }[];
-  host: string;
-  authorLink: string;
-  view: string;
-}
 
-export interface DetailStory {
-  name: string;
-  title: string;
-  link: string;
-  cover: string;
-  description: string;
-  author: string;
-  authorLink: string;
-  categoryList: Category[];
-  detail: string;
-  host: string;
-}
-
-export interface ContentStory {
-  name: string;
-  title: string;
-  chap: string;
-  chapterTitle: string;
-  content: string;
-  author: string;
-  cover: string;
-  host: string;
-}
-
-export interface ListChapter {
-  title: string;
-  host: string;
-  maxChapter: number;
-  listChapter: chapterItem[];
-  currentPage: number;
-  maxPage: number;
-  chapterPerPage: number;
-}
-export interface chapterItem {
-  content?: string;
-  href?: string;
-}
 function removeVietnameseAccents(str: string): string {
   return str
     .normalize('NFD')
@@ -546,7 +491,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     pageNumber = pageNumber - 1;
     pageNumber = pageNumber >= 0 ? pageNumber : 0;
 
-    const chapters: chapterItem[] | null = [];
+    const chapters: ChapterItem[] | null = [];
     const chapterPerPage: number = 50;
     try {
       const searchString: string = `${this.getBaseUrl()}/doc-truyen/page/${storyId}?page=${pageNumber}&limit=${chapterPerPage}&web=0`;

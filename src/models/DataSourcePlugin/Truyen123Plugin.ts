@@ -1,57 +1,13 @@
 import { IDataSourcePlugin } from '../DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
-interface StoryData {
-  name: string;
-  link?: string;
-  title?: string;
-  cover?: string;
-  description?: string;
-  host?: string;
-  author?: string;
-  authorLink?: string;
-  view?: string;
-  categoryList?: Category[];
-}
-interface DetailStory {
-  name: string;
-  link?: string;
-  title?: string;
-  cover?: string;
-  description?: string;
-  host?: string;
-  author?: string;
-  authorLink?: string;
-  detail?: string;
-  categoryList?: Category[];
-}
-interface changeDataSourceStory {
-  data: StoryData;
-  message: string;
-}
-interface ChapterListTruyen123 {
-  title: string;
-  host: string;
-  maxChapter: number;
-  listChapter: { content: string; href: string }[];
-  currentPage: number;
-  maxPage: number;
-  chapterPerPage: number;
-}
-interface Category {
-  content: string | undefined;
-  href: string | undefined;
-}
-interface ContentStory {
-  name: string;
-  title?: string;
-  chapterTitle?: string;
-  chap?: string;
-  host?: string;
-  content?: string;
-  cover?: string;
-  author?: string;
-}
+import { ContentStory } from '../Interfaces/ContentStory';
+import { Category } from '../Interfaces/Category';
+import { ListChapter } from '../Interfaces/ListChapter';
+import { DetailStory } from '../Interfaces/DetailStory';
+import { Story } from '../Interfaces/Story';
+import { ChangeDataSourceStory } from '../Interfaces/ChangeDataSourceStory';
+
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://123truyen.info';
@@ -78,7 +34,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
     if (!chap) chap = '1';
     try {
-      const story: changeDataSourceStory | null =
+      const story: ChangeDataSourceStory | null =
         await this.changeDetailStoryToThisDataSource(title);
 
       const foundTitle: string | undefined =
@@ -96,7 +52,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         return result;
       }
 
-      const chapterPaginationData: ChapterListTruyen123 = await this.chapterList(checkedTitle);
+      const chapterPaginationData: ListChapter = await this.chapterList(checkedTitle);
       const chapNumber: number = Number.parseInt(chap);
       if (chapNumber > chapterPaginationData.maxChapter) {
         const result: object = {
@@ -149,8 +105,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
-  private getStoryMostLikeTitle(html: string, title: string): StoryData[] | null {
-    const data: StoryData[] = [];
+  private getStoryMostLikeTitle(html: string, title: string): Story[] | null {
+    const data: Story[] = [];
 
     const $ = cheerio.load(html);
     const elements = $('.list-new .row');
@@ -164,10 +120,11 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         return;
       }
       const name = $(element).find('.col-title h3').first().text().trim();
-      const link = $(element).find('a').first().attr('href');
+      const link = $(element).find('a').first().attr('href') || '';
       const url = new URL(link ?? '');
       const titleOfStory = url.pathname.substr(1);
-      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const cover =
+        $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '') || '';
       const description = $(element).find('.chapter-text').first().text();
       const author = $(element)
         .find('.col-author a')
@@ -178,13 +135,13 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         .text()
         .trim();
       const authorUrl = $(element).find('.col-author a').attr('href');
-      const authorLink = authorUrl?.split('/').pop();
+      const authorLink = authorUrl?.split('/').pop() || '';
       const view = $(element).find('.col-view.show-view').text().trim();
       const categoryList = $(element)
         .find('.col-category a')
         .map((_, childElement) => {
-          const content = $(childElement).text().trim();
-          const href = $(childElement).attr('href')?.split('/').pop();
+          const content = $(childElement).text().trim() || '';
+          const href = $(childElement).attr('href')?.split('/').pop() || '';
           return { content, href };
         })
         .get();
@@ -226,7 +183,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const text = await response.text();
-        let data: StoryData[] | null = [];
+        let data: Story[] | null = [];
         data = this.getStoryMostLikeTitle(text, title);
 
         return data;
@@ -236,16 +193,17 @@ export class Truyen123Plugin implements IDataSourcePlugin {
       return null;
     }
   }
-  private getSearchedStory(html: string): StoryData[] | null {
-    const data: StoryData[] = [];
+  private getSearchedStory(html: string): Story[] | null {
+    const data: Story[] = [];
 
     const $ = cheerio.load(html);
     $('.list-new .row').each((index, element) => {
       const name = $(element).find('.col-title h3').first().text().trim();
-      const link = $(element).find('a').first().attr('href');
+      const link = $(element).find('a').first().attr('href') || '';
       const url = new URL(link ?? '');
       const title = url.pathname.substr(1);
-      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const cover =
+        $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '') || '';
       const description = $(element).find('.chapter-text').first().text();
       const author = $(element)
         .find('.col-author a')
@@ -256,13 +214,13 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         .text()
         .trim();
       const authorUrl = $(element).find('.col-author a').attr('href');
-      const authorLink = authorUrl?.split('/').pop();
+      const authorLink = authorUrl?.split('/').pop() || '';
       const view = $(element).find('.col-view.show-view').text().trim();
       const categoryList = $(element)
         .find('.col-category a')
         .map((_, childElement) => {
-          const content = $(childElement).text().trim();
-          const href = $(childElement).attr('href')?.split('/').pop();
+          const content = $(childElement).text().trim() || '';
+          const href = $(childElement).attr('href')?.split('/').pop() || '';
           return { content, href };
         })
         .get();
@@ -285,7 +243,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   public async search(title: string, page?: string, category?: string): Promise<any> {
     if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/search?q=${encodeURIComponent(title)}&page=${page}`;
-    let data: StoryData[] | null = [];
+    let data: Story[] | null = [];
     try {
       console.log('searchString: ', searchString);
       const response = await fetch(searchString, {
@@ -409,18 +367,18 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const $ = cheerio.load(text);
 
         const name = $('.wrapper').find('h1.title').first().text();
-        const cover = $('.wrapper').find('.book img').first().attr('src');
+        const cover = $('.wrapper').find('.book img').first().attr('src') || '';
         const author = $('.wrapper').find('.info').find('[itemprop="author"]').text();
         const authorUrl = new URL(
           $('.wrapper').find('.info').find('[itemprop="author"]').attr('href') ?? ''
         );
-        const authorLink = authorUrl.pathname.split('/').pop();
+        const authorLink = authorUrl.pathname.split('/').pop() || '';
         const categoryList = $('.wrapper')
           .find('.info')
           .find('a[itemprop="genre"]')
           .map((_, childElement) => {
-            const content = $(childElement).text().trim();
-            const href = $(childElement).attr('href')?.split('/').pop();
+            const content = $(childElement).text().trim() || '';
+            const href = $(childElement).attr('href')?.split('/').pop() || '';
             return { content, href };
           })
           .get();
@@ -464,6 +422,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
   }
 
   public async contentStory(title: string, chap?: string): Promise<any> {
+    if (!chap) chap = '1';
     const searchString: string = `${this.getBaseUrl()}/${title}/chuong-${chap}`;
     const searchString2: string = `${this.getBaseUrl()}/${title}`;
     try {
@@ -497,7 +456,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
         const $2 = cheerio.load(text2);
 
-        const cover = $2('.wrapper').find('.book img').first().attr('src');
+        const cover = $2('.wrapper').find('.book img').first().attr('src') || '';
         const author = $2('.wrapper').find('.info').find('[itemprop="author"]').text();
 
         const data: ContentStory = {
@@ -555,7 +514,7 @@ export class Truyen123Plugin implements IDataSourcePlugin {
         const $ = cheerio.load(text);
         $('.list-cat-inner a').each((index, element) => {
           const content = $(element).text().trim();
-          const href = $(element).attr('href')?.split('/').pop();
+          const href = $(element).attr('href')?.split('/').pop() || '';
           //const url = link + ;
           // const urlCategory = new URL(link ?? '');
           // const url = urlCategory.pathname.substr(1);
@@ -648,8 +607,8 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
   public register(name: string, listFunction: (limiter?: number, page?: string) => any) {
     this.listStoryMap.set(name, listFunction);
   }
-  private getListStory(html: string, limiter?: number): StoryData[] | null {
-    const data: StoryData[] | null = [];
+  private getListStory(html: string, limiter?: number): Story[] | null {
+    const data: Story[] | null = [];
     const $ = cheerio.load(html);
     $('.list-new .row').each((index, element) => {
       if (limiter && index >= limiter) {
@@ -657,10 +616,11 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
       }
       const name = $(element).find('.col-title h3').first().text().trim();
 
-      const link = $(element).find('a').first().attr('href');
+      const link = $(element).find('a').first().attr('href') || '';
       const url = new URL(link ?? '');
       const title = url.pathname.substr(1);
-      const cover = $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '');
+      const cover =
+        $(element).find('.thumb img').first()?.attr('src')?.replace('-thumbw', '') || '';
       const description = $(element).find('.chapter-text').first().text();
       const author = $(element)
         .find('.col-author a')
@@ -671,13 +631,13 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
         .text()
         .trim();
       const authorUrl = $(element).find('.col-author a').attr('href');
-      const authorLink = authorUrl?.split('/').pop();
+      const authorLink = authorUrl?.split('/').pop() || '';
       const view = $(element).find('.col-view.show-view').text().trim();
       const categoryList = $(element)
         .find('.col-category a')
         .map((_, childElement) => {
-          const content = $(childElement).text().trim();
-          const href = $(childElement).attr('href')?.split('/').pop();
+          const content = $(childElement).text().trim() || '';
+          const href = $(childElement).attr('href')?.split('/').pop() || '';
           return { content, href };
         })
         .get();
@@ -708,7 +668,7 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const text = await response.text();
-        let data: StoryData[] | null = [];
+        let data: Story[] | null = [];
         data = this.getListStory(text, limiter);
 
         return data;
@@ -729,7 +689,7 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const text = await response.text();
-        let data: StoryData[] | null = [];
+        let data: Story[] | null = [];
         data = this.getListStory(text, limiter);
 
         return data;
@@ -750,7 +710,7 @@ export class Truyen123ListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const text = await response.text();
-        let data: StoryData[] | null = [];
+        let data: Story[] | null = [];
         data = this.getListStory(text, limiter);
 
         return data;

@@ -10,14 +10,7 @@ import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlug
 import { DataSourceManager } from '~/models/DataSourceManagement/DataSourceManager';
 import { deleteFile } from '~/utils/FileUtility';
 import { removeInvalidCharacter } from '~/utils/StringUtility';
-interface contentStoryAPI {
-  name: string;
-  title: string;
-  chapterTitle: string;
-  chap: string;
-  host: string;
-  content: string;
-}
+import { ContentStory } from '~/models/Interfaces/ContentStory';
 const upload = multer();
 
 export const downloadChapter = wrapRequestHandler(
@@ -35,7 +28,7 @@ export const downloadChapter = wrapRequestHandler(
       const dataSourceManager: DataSourceManager = DataSourceManager.getInstance();
       const plugin: IDataSourcePlugin | null = dataSourceManager.select(`${source}Plugin`);
       if (plugin != null) {
-        const result: contentStoryAPI | null = await plugin.contentStory(title, chap);
+        const result: ContentStory | null = await plugin.contentStory(title, chap);
         // console.log('result in controller: ', result);
         if (result != null) {
           //result.chap = removeInvalidCharacter(result.chap);

@@ -4,142 +4,18 @@ import cheerio from 'cheerio';
 import e from 'express';
 import { data } from 'node_modules/cheerio/lib/api/attributes';
 import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
-interface ItemTruyenfull {
-  id: string;
-  title: string;
-  image: string;
-  is_full: boolean;
-  time: string;
-  author: string;
-  categories: string;
-  category_ids: string;
-  total_chapters: number;
-}
-interface DetailStory {
-  name: string;
-  link?: string;
-  title?: string;
-  cover?: string;
-  description?: string;
-  host?: string;
-  author?: string;
-  authorLink?: string;
-  detail?: string;
-  categoryList?: Category[];
-}
-interface APITruyenfullResponse {
-  status: string;
-  message: string;
-  status_code: number;
-  meta: {
-    pagination: {
-      total: number;
-      count: number;
-      per_page: number;
-      current_page: number;
-      total_pages: number;
-      links: {
-        previous: string;
-        next: string;
-      };
-    };
-  };
-  data: ItemTruyenfull[];
-}
-interface DetailStoryItemTruyenfull {
-  id: number;
-  title: string;
-  image: string;
-  link: string;
-  status: string;
-  author: string;
-  time: string;
-  source: string;
-  liked: boolean;
-  total_chapters: number;
-  total_like: number;
-  total_view: string;
-  categories: string;
-  category_ids: string;
-  chapters_new: string;
-  new_chapters: any[]; // or specify the type of new_chapters if available
-  description: string;
-}
-interface ContentStoryItemTruyenfull {
-  chapter_id: number;
-  story_id: number;
-  story_name: string;
-  chapter_name: string;
-  chapter_next: number | null;
-  chapter_prev: number | null;
-  has_image: boolean;
-  position: number;
-  current_page: number;
-  content: string;
-}
-interface ChapterItemTruyenfull {
-  id: number;
-  title: string;
-  date: string;
-}
-interface APIListChapterTruyenfullResponse {
-  status: string;
-  message: string;
-  status_code: number;
-  meta: {
-    pagination: {
-      total: number;
-      count: number;
-      per_page: number;
-      current_page: number;
-      total_pages: number;
-      links: {
-        previous: string;
-        next: string;
-      };
-    };
-  };
-  data: ChapterItemTruyenfull[];
-}
-interface StoryData {
-  name: string;
-  link?: string;
-  title?: string;
-  cover?: string;
-  description?: string;
-  host?: string;
-  author?: string;
-  authorLink?: string;
-  view?: string;
-  categoryList?: Category[];
-}
-interface Category {
-  content: string | undefined;
-  href: string | undefined;
-}
-interface changeDataSourceStory {
-  data: StoryData;
-  message: string;
-}
-interface ChapterListTruyenfull {
-  title: string;
-  host: string;
-  maxChapter: number;
-  listChapter: { content: string; href: string }[];
-  currentPage: number;
-  maxPage: number;
-  chapterPerPage: number;
-}
-interface ContentStory {
-  name: string;
-  title?: string;
-  chapterTitle?: string;
-  chap?: string;
-  host?: string;
-  content?: string;
-  cover?: string;
-  author?: string;
-}
+import { StoryTruyenfull } from '../Interfaces/StoryTruyenfull';
+import { Category } from '../Interfaces/Category';
+import { ContentStory } from '../Interfaces/ContentStory';
+import { ListChapter } from '../Interfaces/ListChapter';
+import { DetailStory } from '../Interfaces/DetailStory';
+import { Story } from '../Interfaces/Story';
+import { ChangeDataSourceStory } from '../Interfaces/ChangeDataSourceStory';
+import { DetailStoryTruyenfull } from '../Interfaces/DetailStoryTruyenfull';
+import { ChapterItemTruyenfull } from '../Interfaces/ChapterItemTruyenfull';
+import { APIListChapterTruyenfullResponse } from '../Interfaces/APIListChapterTruyenfullResponse';
+import { ContentStoryTruyenfull } from '../Interfaces/ContentStoryTruyenfull';
+
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';
@@ -167,7 +43,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
   public async changeContentStoryToThisDataSource(title: string, chap?: string): Promise<any> {
     if (!chap) chap = '1';
     try {
-      const story: changeDataSourceStory | null =
+      const story: ChangeDataSourceStory | null =
         await this.changeDetailStoryToThisDataSource(title);
 
       const foundTitle: string | undefined =
@@ -241,13 +117,13 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        const data: StoryData[] = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        const data: Story[] = [];
 
         if (dataArr.length <= 0) {
           return null;
         }
-        dataArr.forEach((element: ItemTruyenfull) => {
+        dataArr.forEach((element: StoryTruyenfull) => {
           if (data.length === 1) {
             return;
           }
@@ -306,10 +182,10 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        const data: StoryData[] = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        const data: Story[] = [];
 
-        dataArr.forEach((element: ItemTruyenfull) => {
+        dataArr.forEach((element: StoryTruyenfull) => {
           const name = element?.title;
           const link = this.convertToUnicodeAndCreateURL(element.title);
           const title = element?.id.toString();
@@ -405,7 +281,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           listChapter.push({ content, href });
         });
 
-        const data: ChapterListTruyenfull = {
+        const data: ListChapter = {
           title,
           host,
           maxChapter,
@@ -449,7 +325,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataResponse: DetailStoryItemTruyenfull = json.data;
+        const dataResponse: DetailStoryTruyenfull = json.data;
 
         const name = dataResponse.title;
         const title = dataResponse.id.toString();
@@ -505,10 +381,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
     const searchString2: string = `${this.getBaseUrl()}/v1/story/detail/${title}`;
 
     try {
-      const chapterList: ChapterListTruyenfull = await this.chapterList(
-        title,
-        pageNumber.toString()
-      );
+      const chapterList: ListChapter = await this.chapterList(title, pageNumber.toString());
 
       if (chapterList === null) {
         console.log('ChapterList is null');
@@ -526,7 +399,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         return null;
       }
 
-      const chapterId: string = chapterList.listChapter[indexChapterInPage].href;
+      const chapterId: string = chapterList.listChapter[indexChapterInPage].href || 'href is null';
       const searchString: string = `${this.getBaseUrl()}/v1/chapter/detail/${chapterId}`;
 
       console.log('searchString: ', searchString);
@@ -545,7 +418,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
       });
       if (response.ok && response2.ok) {
         const json = await response.json();
-        const dataResponse: ContentStoryItemTruyenfull = json.data;
+        const dataResponse: ContentStoryTruyenfull = json.data;
         const name = dataResponse.story_name;
         const title = dataResponse.story_id.toString();
         const chapterTitle = dataResponse.chapter_name;
@@ -553,7 +426,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const content = dataResponse.content.replaceAll(/<br\/>|<i>|<\/i>|<b>|<\/b>/g, '');
 
         const json2 = await response2.json();
-        const dataResponse2: DetailStoryItemTruyenfull = json2.data;
+        const dataResponse2: DetailStoryTruyenfull = json2.data;
 
         const cover = dataResponse2.image;
         const author = dataResponse2.author;
@@ -615,7 +488,7 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
         const $ = cheerio.load(text);
         $('.dropdown-menu ul li a').each((index, element) => {
           const content = $(element).text().trim();
-          const href = $(element).attr('href');
+          const href = $(element).attr('href') || '';
 
           data.push({
             content,
@@ -764,9 +637,9 @@ export class TruyenfullListStoryStrategy implements IListStoryStrategy {
 
     return url;
   }
-  private getListStory(dataArr: ItemTruyenfull[], limiter?: number): StoryData[] | null {
-    const data: StoryData[] | null = [];
-    dataArr.forEach((element: ItemTruyenfull) => {
+  private getListStory(dataArr: StoryTruyenfull[], limiter?: number): Story[] | null {
+    const data: Story[] | null = [];
+    dataArr.forEach((element: StoryTruyenfull) => {
       if (limiter && data.length >= limiter) {
         return;
       }
@@ -812,8 +685,8 @@ export class TruyenfullListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        let data: StoryData[] | null = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        let data: Story[] | null = [];
         data = this.getListStory(dataArr, limiter);
 
         return data;
@@ -838,8 +711,8 @@ export class TruyenfullListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        let data: StoryData[] | null = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        let data: Story[] | null = [];
         data = this.getListStory(dataArr, limiter);
 
         return data;
@@ -864,8 +737,8 @@ export class TruyenfullListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        let data: StoryData[] | null = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        let data: Story[] | null = [];
         data = this.getListStory(dataArr, limiter);
 
         return data;
@@ -890,8 +763,8 @@ export class TruyenfullListStoryStrategy implements IListStoryStrategy {
       });
       if (response.ok) {
         const json = await response.json();
-        const dataArr: ItemTruyenfull[] = json.data;
-        let data: StoryData[] | null = [];
+        const dataArr: StoryTruyenfull[] = json.data;
+        let data: Story[] | null = [];
         data = this.getListStory(dataArr, limiter);
 
         return data;

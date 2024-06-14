@@ -1,71 +1,13 @@
 import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
-
-interface Story {
-  name: string;
-  link: string;
-  title: string;
-  cover: string;
-  description: string;
-  host: string;
-  author: string;
-  authorLink: string;
-  categoryList: Category[];
-  view: string;
-}
-interface changeDataSourceStory {
-  data: Story;
-  message: string;
-}
-interface ListChapter {
-  title: string;
-  host: string;
-  maxChapter: number;
-  listChapter: {
-    content: string;
-    href: string;
-  }[];
-  currentPage: number;
-  maxPage: number;
-  chapterPerPage: number;
-}
-interface partialContentStory {
-  name: string;
-  chapterTitle: string;
-  chap: string;
-  author: string;
-  content: string;
-  host: string;
-}
-interface Category {
-  content: string;
-  href: string;
-}
-
-interface DetailStory {
-  name: string;
-  title: string;
-  cover: string;
-  link: string;
-  author: string;
-  authorLink: string;
-  description: string;
-  categoryList: Category[];
-  detail: string;
-  host: string;
-}
-
-interface ContentStory {
-  name: string;
-  title: string;
-  chap: string;
-  chapterTitle: string;
-  content: string;
-  author: string;
-  cover: string;
-  host: string;
-}
+import { Category } from '../Interfaces/Category';
+import { ContentStory } from '../Interfaces/ContentStory';
+import { DetailStory } from '../Interfaces/DetailStory';
+import { PartialContentStory } from '../Interfaces/PartialContentStory';
+import { ListChapter } from '../Interfaces/ListChapter';
+import { ChangeDataSourceStory } from '../Interfaces/ChangeDataSourceStory';
+import { Story } from '../Interfaces/Story';
 
 function removeVietnameseAccents(str: string): string {
   return str
@@ -165,7 +107,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
   ): Promise<any> {
     if (!chap) chap = '1';
     try {
-      const story: changeDataSourceStory | null =
+      const story: ChangeDataSourceStory | null =
         await this.changeDetailStoryToThisDataSource(title);
 
       const foundTitle: string | undefined =
@@ -499,7 +441,7 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
     let result: ContentStory;
     //const resultDetailStory = await this.detailStory(title);
     const tempTitle = title;
-    let data: partialContentStory;
+    let data: PartialContentStory;
     // title = resultDetailStory.name;
     // console.log('title sau khi decode: ', resultDetailStory.name);
     if (!chap) chap = '1';
