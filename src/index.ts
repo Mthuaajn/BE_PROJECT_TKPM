@@ -22,7 +22,7 @@ const app = express();
 const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
 dataSourceFactory.loadPlugins();
-dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
+dataSourceManager.setDataSourceMap(dataSourceFactory.cloneAllPlugins());
 dataSourceManager.printAllPlugins();
 //dataSourceManager.runPlugins();
 
@@ -38,8 +38,9 @@ fileWatcher.on('fileAdded', async (filename) => {
   dataSourceManager.clearAllPlugins();
 
   await dataSourceFactory.loadPlugins();
-  dataSourceManager.setDataSourceMap(dataSourceFactory.getDataSourceMap());
+  dataSourceManager.setDataSourceMap(dataSourceFactory.cloneAllPlugins());
   dataSourceManager.printAllPlugins();
+  console.log('All data source plugins are running ...');
   //dataSourceManager.runPlugins();
 
   // dataSourceFactory.clearAllPlugins();
@@ -50,7 +51,7 @@ fileWatcher.on('fileAdded', async (filename) => {
 const fileExtensionFactory = FileExtensionFactory.getInstance();
 const fileExtensionManager = FileExtensionManager.getInstance();
 fileExtensionFactory.loadPlugins();
-fileExtensionManager.setFileExtensionMap(fileExtensionFactory.getFileExtensionMap());
+fileExtensionManager.setFileExtensionMap(fileExtensionFactory.cloneAllPlugins());
 fileExtensionManager.printAllPlugins();
 
 const directoryOfFileExtensionPlugin = path.join(__dirname, '/models/FileExtensionPlugin');
@@ -63,8 +64,9 @@ fileWatcherForFileExtensionPlugin.on('fileAdded', async (filename) => {
   fileExtensionManager.clearAllPlugins();
 
   await fileExtensionFactory.loadPlugins();
-  fileExtensionManager.setFileExtensionMap(fileExtensionFactory.getFileExtensionMap());
+  fileExtensionManager.setFileExtensionMap(fileExtensionFactory.cloneAllPlugins());
   fileExtensionManager.printAllPlugins();
+  console.log('All file extension plugins are running ...');
 });
 //DatabaseService.run().catch(console.dir);
 app.use(express.json());

@@ -34,6 +34,11 @@ export class FileExtensionManager {
   public setFileExtensionMap(map: Map<string, IFileExtensionPlugin>): void {
     //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
     //this.dataSourcePlugin = this.deepCopyMap(map);
+    this.fileExtensionPlugin = map;
+  }
+  public setCloneFileExtensionMap(map: Map<string, IFileExtensionPlugin>): void {
+    //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
+    //this.dataSourcePlugin = this.deepCopyMap(map);
     this.fileExtensionPlugin = this.cloneDataSourceMap(map);
   }
 

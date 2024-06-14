@@ -35,6 +35,26 @@ export class DataSourceFactory {
     return null;
   }
 
+  public clonePlugin(name: string): IDataSourcePlugin | null {
+    if (this.dataSourceMap.has(name)) {
+      const plugin: IDataSourcePlugin | null = this.dataSourceMap.get(name) ?? null;
+
+      if (plugin != null) {
+        return plugin.clone(plugin.name);
+      }
+    }
+    return null;
+  }
+
+  public cloneAllPlugins(): Map<string, IDataSourcePlugin> {
+    const mapPlugins: Map<string, IDataSourcePlugin> = new Map<string, IDataSourcePlugin>();
+    this.dataSourceMap.forEach((value, key) => {
+      mapPlugins.set(key, value.clone(key));
+    });
+
+    return mapPlugins;
+  }
+
   public getDataSourceMap(): Map<string, IDataSourcePlugin> {
     return this.dataSourceMap;
   }

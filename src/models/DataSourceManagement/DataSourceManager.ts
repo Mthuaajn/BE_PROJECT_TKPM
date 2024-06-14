@@ -35,6 +35,12 @@ export class DataSourceManager {
   public setDataSourceMap(map: Map<string, IDataSourcePlugin>): void {
     //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
     //this.dataSourcePlugin = this.deepCopyMap(map);
+    this.dataSourcePlugin = map;
+  }
+
+  public setCloneDataSourceMap(map: Map<string, IDataSourcePlugin>): void {
+    //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
+    //this.dataSourcePlugin = this.deepCopyMap(map);
     this.dataSourcePlugin = this.cloneDataSourceMap(map);
   }
 

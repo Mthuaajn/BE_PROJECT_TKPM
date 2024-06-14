@@ -36,6 +36,15 @@ export class FileExtensionFactory {
     return this.fileExtensionMap;
   }
 
+  public cloneAllPlugins(): Map<string, IFileExtensionPlugin> {
+    const mapPlugins: Map<string, IFileExtensionPlugin> = new Map<string, IFileExtensionPlugin>();
+    this.fileExtensionMap.forEach((value, key) => {
+      mapPlugins.set(key, value.clone());
+    });
+
+    return mapPlugins;
+  }
+
   public loadPlugins() {
     try {
       const fileNames: string[] = getFileNamesInFolder(fileExtensionPluginFolder);
