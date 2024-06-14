@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "module": "NodeNext", // Quy định output module được sử dụng
-    "moduleResolution": "NodeNext",
-    "target": "ES2022", // Target output cho code
+    
     "outDir": "dist", // Đường dẫn output cho thư mục build
     "esModuleInterop": true,
     "strict": true /* Enable all strict type-checking options. */,
@@ -10,7 +8,9 @@
     "baseUrl": ".", // Đường dẫn base cho các import
     "paths": {
       "~/*": ["src/*"] // Đường dẫn tương đối cho các import (alias)
-    }
+    },
+    "module": "commonjs",
+    "target": "ES2022",
   },
   "ts-node": {
     "require": ["tsconfig-paths/register"]

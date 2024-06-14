@@ -1,6 +1,5 @@
 import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
-import { listChapter } from '~/controllers/DataSource.controllers';
 import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
 
 interface Story {
@@ -661,7 +660,7 @@ export class NoveltoonListStoryStrategy implements IListStoryStrategy {
   baseUrl: string = 'https://noveltoon.vn/';
   public constructor(url: string) {
     this.baseUrl = url;
-    this.name = 'TangThuVienListStoryStrategy';
+    this.name = 'NoveltoonListStoryStrategy';
     this.listStoryMap = new Map<string, (limiter?: number, page?: string) => any>();
     this.register('newest', this.newestStory);
     this.register('hot', this.hotStory);
