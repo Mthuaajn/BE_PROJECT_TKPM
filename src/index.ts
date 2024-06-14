@@ -1,14 +1,14 @@
 import { defaultErrorHandlers } from './middlewares/error.middlewares';
 import express from 'express';
 import dataSourceRouter from './routes/DataSource.routes';
-import { DataSourceFactory } from './models/DataSource/DataSourceFactory';
-import { DataSourceManager } from './models/DataSource/DataSourceManager';
+import { DataSourceFactory } from './models/DataSourceManagement/DataSourceFactory';
+import { DataSourceManager } from './models/DataSourceManagement/DataSourceManager';
 import path from 'path';
 import { FileWatcher } from './models/FileWatcher';
 import { hostname } from 'os';
 import fileExtensionRouter from './routes/FileExtension.routes';
-import { FileExtensionFactory } from './models/FileExtension/FileExtensionFactory';
-import { FileExtensionManager } from './models/FileExtension/FileExtensionManager';
+import { FileExtensionFactory } from './models/FileExtensionManagement/FileExtensionFactory';
+import { FileExtensionManager } from './models/FileExtensionManagement/FileExtensionManager';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');

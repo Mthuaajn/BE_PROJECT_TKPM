@@ -1,4 +1,4 @@
-import { IFileExtensionPlugin } from '../FileExtension/IFileExtensionPlugin';
+import { IFileExtensionPlugin } from '../FileExtensionManagement/IFileExtensionPlugin';
 import * as puppeteer from 'puppeteer';
 
 function sanitizeTitle(title: string): string {

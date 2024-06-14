@@ -4,10 +4,10 @@ import archiver from 'archiver';
 import multer from 'multer';
 import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { FileExtensionManager } from '~/models/FileExtension/FileExtensionManager';
-import { IFileExtensionPlugin } from '~/models/FileExtension/IFileExtensionPlugin';
-import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
-import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
+import { FileExtensionManager } from '~/models/FileExtensionManagement/FileExtensionManager';
+import { IFileExtensionPlugin } from '~/models/FileExtensionManagement/IFileExtensionPlugin';
+import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
+import { DataSourceManager } from '~/models/DataSourceManagement/DataSourceManager';
 import { deleteFile } from '~/utils/FileUtility';
 import { removeInvalidCharacter } from '~/utils/StringUtility';
 interface contentStoryAPI {

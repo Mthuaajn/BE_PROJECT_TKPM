@@ -1,9 +1,9 @@
 import { url } from 'inspector';
-import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
+import { IDataSourcePlugin } from '../DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import e from 'express';
 import { data } from 'node_modules/cheerio/lib/api/attributes';
-import { IListStoryStrategy } from '../DataSource/IListStoryStrategy';
+import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
 interface ItemTruyenfull {
   id: string;
   title: string;
@@ -266,8 +266,8 @@ export class TruyenfullPlugin implements IDataSourcePlugin {
           const lowerCaseTitle: string = title.toLowerCase();
           // console.log('name: ', lowerCaseName);
           // console.log('title: ', lowerCaseTitle);
-          const found: boolean = lowerCaseName === lowerCaseTitle;
-          // lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+          const found: boolean = //lowerCaseName === lowerCaseTitle;
+            lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
           //console.log('found: ', found);
           if (found) {
             data.push({

@@ -1,6 +1,6 @@
-import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
+import { IDataSourcePlugin } from '../DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
-import { IListStoryStrategy } from '../DataSource/IListStoryStrategy';
+import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
 interface StoryData {
   name: string;
   link?: string;
@@ -191,8 +191,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
       const lowerCaseName: string = name.toLowerCase();
       const lowerCaseTitle: string = title.toLowerCase();
-      const found: boolean = lowerCaseName === lowerCaseTitle;
-      //  lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+      const found: boolean = //lowerCaseName === lowerCaseTitle;
+        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
       //console.log('found in search by title: ', found);
 
       if (found) {

@@ -1,5 +1,5 @@
 import { error } from 'console';
-import { IFileExtensionPlugin } from '../FileExtension/IFileExtensionPlugin';
+import { IFileExtensionPlugin } from '../FileExtensionManagement/IFileExtensionPlugin';
 import * as fs from 'fs';
 
 export class TXTPlugin implements IFileExtensionPlugin {

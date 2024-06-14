@@ -1,7 +1,7 @@
-import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
+import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
 import { listChapter } from '~/controllers/DataSource.controllers';
-import { IListStoryStrategy } from '../DataSource/IListStoryStrategy';
+import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
 
 interface Story {
   name: string;
@@ -257,8 +257,8 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
 
       const lowerCaseName: string = name.toLowerCase();
       const lowerCaseTitle: string = searchedTitle.toLowerCase();
-      const found: boolean = lowerCaseName === lowerCaseTitle;
-      // lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+      const found: boolean = //lowerCaseName === lowerCaseTitle;
+        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
 
       if (found) {
         const story: Story = {

@@ -1,6 +1,6 @@
-import { IDataSourcePlugin } from '../DataSource/IDataSourcePlugin';
+import { IDataSourcePlugin } from '../DataSourceManagement/IDataSourcePlugin';
 import cheerio from 'cheerio';
-import { IListStoryStrategy } from '../DataSource/IListStoryStrategy';
+import { IListStoryStrategy } from '../DataSourceManagement/IListStoryStrategy';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const he = require('he');
 export interface Category {
