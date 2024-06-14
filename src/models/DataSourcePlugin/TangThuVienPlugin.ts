@@ -125,6 +125,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   public async changeDetailStoryToThisDataSource(title: string): Promise<any> {
     try {
       const data: object[] | null = await this.searchByTitle(title);
+      //console.log('data: ', data);
       if (data === null || data.length <= 0) {
         const result: object = {
           data: null,
@@ -144,8 +145,10 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     }
   }
   public async searchByTitle(title: string, page?: string): Promise<any> {
+    if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/ket-qua-tim-kiem?term=${title}&page=${page}`;
     let result: Story[] | null = [];
+    console.log('searchString: ', searchString);
     try {
       const response = await fetch(searchString, {
         method: 'GET',
@@ -305,6 +308,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     if (elements.length === 0) {
       return null;
     }
+    //console.log(elements);
 
     $('#rank-view-list li').each((index, element) => {
       if (result.length === 1) return;
@@ -325,9 +329,14 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
       const title = link.substring(startIndex);
 
       const lowerCaseName: string = name.toLowerCase();
+
       const lowerCaseTitle: string = searchedTitle.toLowerCase();
-      const found: boolean =
+      let found: boolean =
         lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+
+      if (name.length === 0) {
+        found = false;
+      }
 
       if (found) {
         const story: Story = {
@@ -397,6 +406,7 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
   private getNumberValueFromString(input: string): any {}
   public async getMaxChapterPage(title: string): Promise<any> {}
   public async search(title: string, page?: string, category?: string): Promise<any> {
+    if (!page) page = '1';
     const searchString: string = `${this.getBaseUrl()}/ket-qua-tim-kiem?term=${title}&page=${page}`;
     let result: Story[] = [];
     try {

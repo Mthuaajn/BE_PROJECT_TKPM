@@ -284,8 +284,9 @@ export const changeDetailStoryDataSource = wrapRequestHandler(
 export const changeContentStoryDataSource = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const source: string = req.query.datasource?.toString() || '';
-    const title: string = req.query.title?.toString() || '';
     const chap: string = req.query.chap?.toString() || '';
+    let title: string = req.query.title?.toString() || '';
+    title = removeBracket(title);
     console.log('source: ', source);
     console.log('title: ', title);
     console.log('chap: ', chap);

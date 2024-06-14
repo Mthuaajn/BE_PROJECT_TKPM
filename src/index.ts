@@ -9,7 +9,6 @@ import { hostname } from 'os';
 import fileExtensionRouter from './routes/FileExtension.routes';
 import { FileExtensionFactory } from './models/FileExtensionManagement/FileExtensionFactory';
 import { FileExtensionManager } from './models/FileExtensionManagement/FileExtensionManager';
-import { createEpub } from './test';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
@@ -17,7 +16,6 @@ import { createEpub } from './test';
 // require('ts-node').register();
 // require('./index.ts');
 // "puppeteer": "^22.10.0"
-createEpub(path.join(__dirname, '../downloadedFile'));
 const port = 3000;
 const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();
