@@ -765,7 +765,7 @@ export class NoveltoonListStoryStrategy implements IListStoryStrategy {
       // Handle the case when the function for the given type is not found
     }
   }
-  public register(name: string, listFunction: () => any) {
+  public register(name: string, listFunction: (limiter?: number, page?: string) => any) {
     this.listStoryMap.set(name, listFunction);
   }
   public async home(): Promise<any> {
