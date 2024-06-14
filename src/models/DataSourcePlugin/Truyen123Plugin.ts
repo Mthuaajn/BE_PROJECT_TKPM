@@ -191,8 +191,8 @@ export class Truyen123Plugin implements IDataSourcePlugin {
 
       const lowerCaseName: string = name.toLowerCase();
       const lowerCaseTitle: string = title.toLowerCase();
-      const found: boolean =
-        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+      const found: boolean = lowerCaseName === lowerCaseTitle;
+      //  lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
       //console.log('found in search by title: ', found);
 
       if (found) {

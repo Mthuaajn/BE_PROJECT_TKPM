@@ -20,7 +20,6 @@ interface contentStoryAPI {
 }
 const upload = multer();
 
-
 export const downloadChapter = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const chap: string = req.query.chap?.toString() || '';

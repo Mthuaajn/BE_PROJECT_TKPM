@@ -257,8 +257,8 @@ export class NoveltoonPlugin implements IDataSourcePlugin {
 
       const lowerCaseName: string = name.toLowerCase();
       const lowerCaseTitle: string = searchedTitle.toLowerCase();
-      const found: boolean =
-        lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
+      const found: boolean = lowerCaseName === lowerCaseTitle;
+      // lowerCaseName.includes(lowerCaseTitle) || lowerCaseTitle.includes(lowerCaseName);
 
       if (found) {
         const story: Story = {

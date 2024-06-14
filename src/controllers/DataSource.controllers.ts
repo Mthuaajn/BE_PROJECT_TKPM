@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { IDataSourcePlugin } from '~/models/DataSource/IDataSourcePlugin';
 import { DataSourceManager } from '~/models/DataSource/DataSourceManager';
-import { removeInvalidCharacter } from '~/utils/StringUtility';
+import { removeBracket, removeInvalidCharacter } from '~/utils/StringUtility';
 export const search = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const search: string = req.query.search?.toString() || '';
@@ -256,7 +256,9 @@ export const ListStoryAtCategory = wrapRequestHandler(
 export const changeDetailStoryDataSource = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
     const source: string = req.query.datasource?.toString() || '';
-    const title: string = req.query.title?.toString() || '';
+    let title: string = req.query.title?.toString() || '';
+    title = removeBracket(title);
+
     console.log('source: ', source);
     console.log('title: ', title);
 
