@@ -777,17 +777,25 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
   };
 
   public async home(): Promise<any> {
-    const hot = await this.hotStory(12, '1');
-    const full = await this.fullStory(12, '1');
-    const newest = await this.newestStory(12, '1');
-    const mostView = await this.mostViewStory(12, '1');
-    const data: object = {
-      hot,
-      newest,
-      full,
-      [TangThuVienListStoryEnum.MOST_VIEW]: mostView
-    };
+    const data: Record<string, any> = {};
+    const parameters: [number, string] = [12, '1'];
+    for (const [key, value] of this.listStoryMap.entries()) {
+      const result = await value(...parameters);
+      data[key] = result;
+    }
+    
     return data;
+    // const hot = await this.hotStory(12, '1');
+    // const full = await this.fullStory(12, '1');
+    // const newest = await this.newestStory(12, '1');
+    // const mostView = await this.mostViewStory(12, '1');
+    // const data: object = {
+    //   hot,
+    //   newest,
+    //   full,
+    //   [TangThuVienListStoryEnum.MOST_VIEW]: mostView
+    // };
+    // return data;
   }
 }
 module.exports = {

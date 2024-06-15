@@ -2,7 +2,6 @@ import { IFileExtensionPlugin } from './IFileExtensionPlugin';
 import path from 'path';
 import fs from 'fs';
 import { getFileNamesInFolder, removeFileExtension } from '../../utils/FileUtility';
-import { contentStory } from '~/controllers/DataSource.controllers';
 
 const fileExtensionPluginFolder = path.join(__dirname, '../FileExtensionPlugin/');
 export class FileExtensionFactory {

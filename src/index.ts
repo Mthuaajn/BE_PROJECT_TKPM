@@ -9,6 +9,8 @@ import { hostname } from 'os';
 import fileExtensionRouter from './routes/FileExtension.routes';
 import { FileExtensionFactory } from './models/FileExtensionManagement/FileExtensionFactory';
 import { FileExtensionManager } from './models/FileExtensionManagement/FileExtensionManager';
+import { IDataSourcePlugin } from './models/DataSourceManagement/IDataSourcePlugin';
+import { mostSearchStory } from './models/TestExtendTruyenfull';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
@@ -25,6 +27,12 @@ dataSourceFactory.loadPlugins();
 dataSourceManager.setDataSourceMap(dataSourceFactory.cloneAllPlugins());
 dataSourceManager.printAllPlugins();
 //dataSourceManager.runPlugins();
+
+const truyenfullPlugin: IDataSourcePlugin | null = dataSourceManager.select('TruyenfullPlugin');
+if (truyenfullPlugin != null) {
+  truyenfullPlugin.listStory.register('most search', mostSearchStory);
+  dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
+}
 
 const directoryToWatch = path.join(__dirname, '/models/DataSourcePlugin');
 const fileWatcher = new FileWatcher(directoryToWatch);

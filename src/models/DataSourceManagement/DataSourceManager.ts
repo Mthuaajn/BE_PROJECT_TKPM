@@ -1,4 +1,3 @@
-import { DataSourceFactory } from './DataSourceFactory';
 import { IDataSourcePlugin } from './IDataSourcePlugin';
 
 export class DataSourceManager {
@@ -44,6 +43,9 @@ export class DataSourceManager {
     this.dataSourcePlugin = this.cloneDataSourceMap(map);
   }
 
+  public setDataSource(key: string, value: IDataSourcePlugin): void {
+    this.dataSourcePlugin.set(key, value);
+  }
   private cloneDataSourceMap(
     originalMap: Map<string, IDataSourcePlugin>
   ): Map<string, IDataSourcePlugin> {

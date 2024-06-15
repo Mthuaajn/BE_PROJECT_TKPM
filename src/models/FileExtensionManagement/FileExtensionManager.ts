@@ -1,4 +1,3 @@
-import { FileExtensionFactory } from './FileExtensionFactory';
 import { IFileExtensionPlugin } from './IFileExtensionPlugin';
 
 export class FileExtensionManager {
