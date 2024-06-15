@@ -61,8 +61,8 @@ export class DataSourceManager {
   public setDataSource(key: string, value: IDataSourcePlugin): void {
     this.dataSourcePlugin.set(key, value);
   }
-  
-  private cloneDataSourceMap(
+
+  public cloneDataSourceMap(
     originalMap: Map<string, IDataSourcePlugin>
   ): Map<string, IDataSourcePlugin> {
     const newMap = new Map<string, IDataSourcePlugin>();
