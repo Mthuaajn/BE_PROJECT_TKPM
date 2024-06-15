@@ -6,12 +6,13 @@ function sanitizeTitle(title: string): string {
   return title.replace(/[^a-zA-Z0-9 \-_]/g, '_');
 }
 
+//This plugin is used for create file PDF
 export class PDFPlugin implements IFileExtensionPlugin {
   name: string;
   public constructor() {
     this.name = 'PDFPlugin';
   }
- 
+
   clone(): IFileExtensionPlugin {
     return new PDFPlugin();
   }

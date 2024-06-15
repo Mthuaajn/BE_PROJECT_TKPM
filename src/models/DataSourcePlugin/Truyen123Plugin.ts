@@ -8,6 +8,7 @@ import { DetailStory } from '../Interfaces/DetailStory';
 import { Story } from '../Interfaces/Story';
 import { ChangeDataSourceStory } from '../Interfaces/ChangeDataSourceStory';
 
+// This class is used for crawl data from Truyen 123 website
 export class Truyen123Plugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://123truyen.info';

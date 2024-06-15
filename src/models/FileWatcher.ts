@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { EventEmitter } from 'events';
 
+//This class is used for recognizing the change in plugin's folder
 export class FileWatcher extends EventEmitter {
   private directoryToWatch: string;
   private fileWatcher: fs.FSWatcher | null;

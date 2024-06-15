@@ -8,6 +8,8 @@ import { Document, Packer, Paragraph, TextRun, Media, ImageRun } from 'docx';
 //const docx = require('docx');
 // import { Document } from 'docx';
 // import { Paragraph, TextRun } from 'docx';
+
+//This plugin is used for create file DOC
 export class DOCPlugin implements IFileExtensionPlugin {
   public constructor() {
     this.name = 'DOCPlugin';

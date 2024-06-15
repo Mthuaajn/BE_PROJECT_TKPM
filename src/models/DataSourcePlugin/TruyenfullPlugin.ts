@@ -16,6 +16,7 @@ import { ChapterItemTruyenfull } from '../Interfaces/ChapterItemTruyenfull';
 import { APIListChapterTruyenfullResponse } from '../Interfaces/APIListChapterTruyenfullResponse';
 import { ContentStoryTruyenfull } from '../Interfaces/ContentStoryTruyenfull';
 
+// This class is used for crawl data from Truyen full website
 export class TruyenfullPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://api.truyenfull.vn';

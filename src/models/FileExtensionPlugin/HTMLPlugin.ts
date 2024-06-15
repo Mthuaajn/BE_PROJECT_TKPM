@@ -3,6 +3,7 @@ import { IFileExtensionPlugin } from '../FileExtensionManagement/IFileExtensionP
 import * as fs from 'fs';
 import { saveAs } from 'file-saver';
 
+//This plugin is used for create file HTML
 export class HTMLPlugin implements IFileExtensionPlugin {
   name: string;
   public constructor() {

@@ -1,12 +1,18 @@
 import { IDataSourcePlugin } from './IDataSourcePlugin';
 
+//This class is used for manage crawl story plugin
 export class DataSourceManager {
+  // Instance of this class, used for singleton design pattern
   private static instance: DataSourceManager;
+
+  // Map used for manage the plugins
   private dataSourcePlugin: Map<string, IDataSourcePlugin>;
 
   private constructor() {
     this.dataSourcePlugin = new Map<string, IDataSourcePlugin>();
   }
+
+  // Get instance of this class using singleton pattern
   public static getInstance(): DataSourceManager {
     if (!DataSourceManager.instance) {
       DataSourceManager.instance = new DataSourceManager();
@@ -15,6 +21,12 @@ export class DataSourceManager {
     return DataSourceManager.instance;
   }
 
+  // Register a new plugin
+  public registerDataSourcePlugin(name: string, dataSourcePlugin: IDataSourcePlugin): void {
+    this.dataSourcePlugin.set(name, dataSourcePlugin);
+  }
+
+  // Get a registered plugin in this class
   public select(name: string): IDataSourcePlugin | null {
     if (this.dataSourcePlugin.has(name)) {
       return this.dataSourcePlugin.get(name) ?? null;
@@ -23,29 +35,33 @@ export class DataSourceManager {
     return null;
   }
 
+  // Clear all plugins in map
   public clearAllPlugins(): void {
     this.dataSourcePlugin.clear();
   }
 
+  // Get plugin map
   public getDataSourceMap(): Map<string, IDataSourcePlugin> | null {
     return this.dataSourcePlugin;
   }
 
+  // Set plugin map
   public setDataSourceMap(map: Map<string, IDataSourcePlugin>): void {
-    //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
-    //this.dataSourcePlugin = this.deepCopyMap(map);
     this.dataSourcePlugin = map;
   }
 
+  // Create a clone plugin map and set it to this class's plugin map
   public setCloneDataSourceMap(map: Map<string, IDataSourcePlugin>): void {
     //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
     //this.dataSourcePlugin = this.deepCopyMap(map);
     this.dataSourcePlugin = this.cloneDataSourceMap(map);
   }
 
+  // Set a plugin
   public setDataSource(key: string, value: IDataSourcePlugin): void {
     this.dataSourcePlugin.set(key, value);
   }
+  
   private cloneDataSourceMap(
     originalMap: Map<string, IDataSourcePlugin>
   ): Map<string, IDataSourcePlugin> {

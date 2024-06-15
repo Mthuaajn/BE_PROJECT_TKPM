@@ -51,6 +51,8 @@ interface changeDataSourceStory {
   data: StoryData;
   message: string;
 }
+
+// This class is used for crawl data from Tang Thu Vien website
 export class TangThuVienPlugin implements IDataSourcePlugin {
   name: string;
   static baseUrl: string = 'https://truyen.tangthuvien.vn';
@@ -783,7 +785,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
       const result = await value(...parameters);
       data[key] = result;
     }
-    
+
     return data;
     // const hot = await this.hotStory(12, '1');
     // const full = await this.fullStory(12, '1');
