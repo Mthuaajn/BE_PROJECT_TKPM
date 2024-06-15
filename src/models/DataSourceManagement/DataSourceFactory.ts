@@ -71,12 +71,12 @@ export class DataSourceFactory {
   }
 
   // load all plugin from a folder
-  public loadPlugins() {
+  public loadPlugins(folderPath: string) {
     try {
-      const fileNames: string[] = getFileNamesInFolder(dataSourcePluginFolder);
+      const fileNames: string[] = getFileNamesInFolder(folderPath);
       for (const name of fileNames) {
         console.log('load plugin name: ', name);
-        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name);
+        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name, folderPath);
         this.registerDataSourcePlugin(removeFileExtension(name), plugin);
       }
     } catch (error) {
@@ -97,10 +97,10 @@ export class DataSourceFactory {
   }
 
   // Load one plugin
-  private loadPluginFromFileName(pluginName: string): IDataSourcePlugin {
+  private loadPluginFromFileName(pluginName: string, folderPath: string): IDataSourcePlugin {
     // const pluginFilePath = `file://${path.join(dataSourcePluginFolder, pluginName)}`;
 
-    const pluginFile = path.join(dataSourcePluginFolder, pluginName);
+    const pluginFile = path.join(folderPath, pluginName);
     //console.log('pluginFile: ', path.join(dataSourcePluginFolder, removeFileExtension(pluginName)));
 
     const moduleName = removeFileExtension(pluginName);

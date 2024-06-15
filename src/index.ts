@@ -21,9 +21,14 @@ import { mostSearchStory } from './models/TestExtendTruyenfull';
 const port = 3000;
 const host = '127.0.0.1'; //'10.0.2.2';////'localhost';
 const app = express();
+
+const directoryOfDataSourcePlugin = path.join(__dirname, '/models/DataSourcePlugin');
+const directoryOfFileExtensionPlugin = path.join(__dirname, '/models/FileExtensionPlugin');
+
 const dataSourceFactory = DataSourceFactory.getInstance();
 const dataSourceManager = DataSourceManager.getInstance();
-dataSourceFactory.loadPlugins();
+
+dataSourceFactory.loadPlugins(directoryOfDataSourcePlugin);
 dataSourceManager.setDataSourceMap(dataSourceFactory.cloneAllPlugins());
 dataSourceManager.printAllPlugins();
 //dataSourceManager.runPlugins();
@@ -34,8 +39,7 @@ if (truyenfullPlugin != null) {
   dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
 }
 
-const directoryToWatch = path.join(__dirname, '/models/DataSourcePlugin');
-const fileWatcher = new FileWatcher(directoryToWatch);
+const fileWatcher = new FileWatcher(directoryOfDataSourcePlugin);
 fileWatcher.startWatching();
 
 // Event listener for 'fileAdded' event
@@ -45,7 +49,7 @@ fileWatcher.on('fileAdded', async (filename) => {
   dataSourceFactory.clearAllPlugins();
   dataSourceManager.clearAllPlugins();
 
-  await dataSourceFactory.loadPlugins();
+  await dataSourceFactory.loadPlugins(directoryOfDataSourcePlugin);
   dataSourceManager.setDataSourceMap(dataSourceFactory.cloneAllPlugins());
   dataSourceManager.printAllPlugins();
   console.log('All data source plugins are running ...');
@@ -58,11 +62,10 @@ fileWatcher.on('fileAdded', async (filename) => {
 
 const fileExtensionFactory = FileExtensionFactory.getInstance();
 const fileExtensionManager = FileExtensionManager.getInstance();
-fileExtensionFactory.loadPlugins();
+fileExtensionFactory.loadPlugins(directoryOfFileExtensionPlugin);
 fileExtensionManager.setFileExtensionMap(fileExtensionFactory.cloneAllPlugins());
 fileExtensionManager.printAllPlugins();
 
-const directoryOfFileExtensionPlugin = path.join(__dirname, '/models/FileExtensionPlugin');
 const fileWatcherForFileExtensionPlugin = new FileWatcher(directoryOfFileExtensionPlugin);
 fileWatcherForFileExtensionPlugin.startWatching();
 
@@ -71,21 +74,21 @@ fileWatcherForFileExtensionPlugin.on('fileAdded', async (filename) => {
   fileExtensionFactory.clearAllPlugins();
   fileExtensionManager.clearAllPlugins();
 
-  await fileExtensionFactory.loadPlugins();
+  await fileExtensionFactory.loadPlugins(directoryOfFileExtensionPlugin);
   fileExtensionManager.setFileExtensionMap(fileExtensionFactory.cloneAllPlugins());
   fileExtensionManager.printAllPlugins();
   console.log('All file extension plugins are running ...');
 });
-//DatabaseService.run().catch(console.dir);
+
 app.use(express.json());
 
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
+
 app.use('/', async (req, res) => {
   res.json({ msg: 'You have accessed to this server successfully!' });
 });
-//import { search } from './controllers/DataSource.controllers';
-//app.get('/api/v1/search/DataSource/Voz/title', search);
+
 app.use('*', defaultErrorHandlers);
 app.listen(port, host, () => {
   console.log(`app running on port http://${host}:${port}/`);

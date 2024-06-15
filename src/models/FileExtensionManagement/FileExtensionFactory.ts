@@ -56,12 +56,12 @@ export class FileExtensionFactory {
   }
 
   // load all plugin from a folder
-  public loadPlugins() {
+  public loadPlugins(folderPath: string) {
     try {
-      const fileNames: string[] = getFileNamesInFolder(fileExtensionPluginFolder);
+      const fileNames: string[] = getFileNamesInFolder(folderPath);
       for (const name of fileNames) {
         console.log('load plugin name: ', name);
-        const plugin: IFileExtensionPlugin = this.loadPluginFromFileName(name);
+        const plugin: IFileExtensionPlugin = this.loadPluginFromFileName(name, folderPath);
         this.registerFileExtensionPlugin(removeFileExtension(name), plugin);
       }
     } catch (error) {
@@ -81,10 +81,10 @@ export class FileExtensionFactory {
   }
 
   // Load one plugin
-  private loadPluginFromFileName(pluginName: string): IFileExtensionPlugin {
+  private loadPluginFromFileName(pluginName: string, folderPath: string): IFileExtensionPlugin {
     //const pluginFilePath = `file://${path.join(fileExtensionPluginFolder, pluginName)}`;
 
-    const pluginFile = path.join(fileExtensionPluginFolder, pluginName);
+    const pluginFile = path.join(folderPath, pluginName);
     //console.log('pluginFile: ', path.join(dataSourcePluginFolder, removeFileExtension(pluginName)));
 
     //const moduleName = removeFileExtension(pluginName);
