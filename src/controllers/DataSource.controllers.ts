@@ -1,9 +1,9 @@
-import { wrapRequestHandler } from '../utils/handlers';
+import { wrapRequestHandler } from '~/utils/handlers';
 import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { IDataSourcePlugin } from '../models/DataSourceManagement/IDataSourcePlugin';
-import { DataSourceManager } from '../models/DataSourceManagement/DataSourceManager';
-import { removeBracket, removeInvalidCharacter } from '../utils/StringUtility';
+import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
+import { DataSourceManager } from '~/models/DataSourceManagement/DataSourceManager';
+import { removeBracket, removeInvalidCharacter } from '~/utils/StringUtility';
 
 // This function is used for handle request search a story, can filt by category
 export const search = wrapRequestHandler(
