@@ -93,3 +93,5 @@ app.use('*', defaultErrorHandlers);
 app.listen(port, host, () => {
   console.log(`app running on port http://${host}:${port}/`);
 });
+
+export default app;
