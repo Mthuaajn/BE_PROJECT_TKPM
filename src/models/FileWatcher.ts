@@ -15,11 +15,8 @@ export class FileWatcher extends EventEmitter {
 
   public startWatching(): void {
     this.fileWatcher = fs.watch(this.directoryToWatch, (eventType, filename) => {
-      if (eventType === 'rename' && filename) {
-        if (fs.existsSync(path.join(this.directoryToWatch, filename))) {
-          console.log(`File added: ${filename}`);
-          this.emit('fileAdded', filename);
-        }
+      if (eventType === 'rename') {
+        this.emit('fileAdded');
       }
     });
 

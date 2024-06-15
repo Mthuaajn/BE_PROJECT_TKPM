@@ -43,7 +43,7 @@ const fileWatcher = new FileWatcher(directoryOfDataSourcePlugin);
 fileWatcher.startWatching();
 
 // Event listener for 'fileAdded' event
-fileWatcher.on('fileAdded', async (filename) => {
+fileWatcher.on('fileAdded', async () => {
   // console.log(`New file added: ${filename}`);
   // Perform additional actions here
   dataSourceFactory.clearAllPlugins();
@@ -69,7 +69,7 @@ fileExtensionManager.printAllPlugins();
 const fileWatcherForFileExtensionPlugin = new FileWatcher(directoryOfFileExtensionPlugin);
 fileWatcherForFileExtensionPlugin.startWatching();
 
-fileWatcherForFileExtensionPlugin.on('fileAdded', async (filename) => {
+fileWatcherForFileExtensionPlugin.on('fileAdded', async () => {
   //console.log(`New file added: ${filename}`);
   fileExtensionFactory.clearAllPlugins();
   fileExtensionManager.clearAllPlugins();
