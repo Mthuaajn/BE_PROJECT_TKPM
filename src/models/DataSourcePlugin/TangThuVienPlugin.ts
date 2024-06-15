@@ -11,7 +11,7 @@ import { PartialChapterPagination } from '../Interfaces/PartialChapterPagination
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const he = require('he');
 
-function removeVietnameseAccents(str: string): string {
+export function removeVietnameseAccents(str: string): string {
   return str
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -626,6 +626,9 @@ export class TangThuVienPlugin implements IDataSourcePlugin {
     return result;
   }
 }
+enum TangThuVienListStoryEnum {
+  MOST_VIEW = 'most view'
+}
 export class TangThuVienListStoryStrategy implements IListStoryStrategy {
   name: string;
   listStoryMap: Map<string, (limiter?: number, page?: string) => any>;
@@ -637,7 +640,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
     this.register('newest', this.newestStory);
     this.register('hot', this.hotStory);
     this.register('full', this.fullStory);
-    this.register('most view', this.mostViewStory);
+    this.register(TangThuVienListStoryEnum.MOST_VIEW, this.mostViewStory);
   }
   getBaseUrl(): string {
     return this.baseUrl;
@@ -782,7 +785,7 @@ export class TangThuVienListStoryStrategy implements IListStoryStrategy {
       hot,
       newest,
       full,
-      'most view': mostView
+      [TangThuVienListStoryEnum.MOST_VIEW]: mostView
     };
     return data;
   }
