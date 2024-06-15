@@ -10,12 +10,19 @@ import fs from 'fs';
 import { getFileNamesInFolder, removeFileExtension } from '../../utils/FileUtility';
 
 const dataSourcePluginFolder = path.join(__dirname, '../DataSourcePlugin/'); //"/models/DataSourcePlugin/";//
+
+//This class is the factory, create plugin from all file in plugin's folder
 export class DataSourceFactory {
+  // Instance of this class, used for singleton design pattern
   private static instance: DataSourceFactory;
+
+  // Map used for manage the plugin
   private dataSourceMap: Map<string, IDataSourcePlugin>;
   private constructor() {
     this.dataSourceMap = new Map<string, IDataSourcePlugin>();
   }
+
+  // Get instance of this class using singleton pattern
   public static getInstance(): DataSourceFactory {
     if (!DataSourceFactory.instance) {
       DataSourceFactory.instance = new DataSourceFactory();
@@ -23,10 +30,12 @@ export class DataSourceFactory {
     return DataSourceFactory.instance;
   }
 
+  // Register a new plugin
   public registerDataSourcePlugin(name: string, dataSourcePlugin: IDataSourcePlugin): void {
     this.dataSourceMap.set(name, dataSourcePlugin);
   }
 
+  // Get a registered plugin in this class
   public select(name: string): IDataSourcePlugin | null {
     if (this.dataSourceMap.has(name)) {
       return this.dataSourceMap.get(name) ?? null;
@@ -34,6 +43,7 @@ export class DataSourceFactory {
     return null;
   }
 
+  // Get a clone instance of one plugin
   public clonePlugin(name: string): IDataSourcePlugin | null {
     if (this.dataSourceMap.has(name)) {
       const plugin: IDataSourcePlugin | null = this.dataSourceMap.get(name) ?? null;
@@ -45,6 +55,7 @@ export class DataSourceFactory {
     return null;
   }
 
+  // Clone all plugin and put into a map
   public cloneAllPlugins(): Map<string, IDataSourcePlugin> {
     const mapPlugins: Map<string, IDataSourcePlugin> = new Map<string, IDataSourcePlugin>();
     this.dataSourceMap.forEach((value, key) => {
@@ -54,16 +65,18 @@ export class DataSourceFactory {
     return mapPlugins;
   }
 
+  // Get plugin map
   public getDataSourceMap(): Map<string, IDataSourcePlugin> {
     return this.dataSourceMap;
   }
 
-  public loadPlugins() {
+  // load all plugin from a folder
+  public loadPlugins(folderPath: string) {
     try {
-      const fileNames: string[] = getFileNamesInFolder(dataSourcePluginFolder);
+      const fileNames: string[] = getFileNamesInFolder(folderPath);
       for (const name of fileNames) {
         console.log('load plugin name: ', name);
-        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name);
+        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name, folderPath);
         this.registerDataSourcePlugin(removeFileExtension(name), plugin);
       }
     } catch (error) {
@@ -71,6 +84,7 @@ export class DataSourceFactory {
     }
   }
 
+  // Clear all plugins in map
   public clearAllPlugins(): void {
     this.dataSourceMap.clear();
   }
@@ -82,10 +96,11 @@ export class DataSourceFactory {
     });
   }
 
-  private loadPluginFromFileName(pluginName: string): IDataSourcePlugin {
-    const pluginFilePath = `file://${path.join(dataSourcePluginFolder, pluginName)}`;
+  // Load one plugin
+  private loadPluginFromFileName(pluginName: string, folderPath: string): IDataSourcePlugin {
+    // const pluginFilePath = `file://${path.join(dataSourcePluginFolder, pluginName)}`;
 
-    const pluginFile = path.join(dataSourcePluginFolder, pluginName);
+    const pluginFile = path.join(folderPath, pluginName);
     //console.log('pluginFile: ', path.join(dataSourcePluginFolder, removeFileExtension(pluginName)));
 
     const moduleName = removeFileExtension(pluginName);

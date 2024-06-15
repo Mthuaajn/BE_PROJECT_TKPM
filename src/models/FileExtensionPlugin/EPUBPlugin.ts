@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import Epub = require('epub-gen');
 import { before } from 'lodash';
 import { promisify } from 'util'; //import { EPub } from 'epub-generator';
+
+//This plugin is used for create file EPUB
 export class EPUBPlugin implements IFileExtensionPlugin {
   public constructor() {
     this.name = 'EPUBPlugin';

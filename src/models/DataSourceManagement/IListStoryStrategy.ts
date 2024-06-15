@@ -1,3 +1,4 @@
+// This interface regulate behavior of list story and home of a data crawl plugin
 export interface IListStoryStrategy {
   name: string;
   listStoryMap: Map<string, (limiter?: number, page?: string) => any>;

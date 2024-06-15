@@ -2,6 +2,7 @@ import { error } from 'console';
 import { IFileExtensionPlugin } from '../FileExtensionManagement/IFileExtensionPlugin';
 import * as fs from 'fs';
 
+//This plugin is used for create file TXT
 export class TXTPlugin implements IFileExtensionPlugin {
   name: string;
   public constructor() {

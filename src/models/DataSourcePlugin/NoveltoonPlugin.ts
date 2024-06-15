@@ -64,6 +64,7 @@ function convertStringToCategoryList(
     .filter((el) => el.content.toLocaleLowerCase() !== 'đã full');
 }
 
+// This class is used for crawl data from Novel Toon website
 export class NoveltoonPlugin implements IDataSourcePlugin {
   name: string;
   listStory: IListStoryStrategy;

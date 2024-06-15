@@ -1,24 +1,49 @@
 import { IListStoryStrategy } from './IListStoryStrategy';
 
+// This interface regulates behaviors of crawl data plugin, and is the abstraction that other component of system can
+// used to interactive with plugins
 export interface IDataSourcePlugin {
+  // Name of plugin
   name: string;
+
+  // List Strory of plugin
   listStory: IListStoryStrategy;
+
+  // Creata a clone instance of this plugin
   clone(name: string): IDataSourcePlugin;
+
+  // Get base url/ host of website
   getBaseUrl(): string;
 
+  // Search story, can filter by category
   search(title: string, page?: string, category?: string): any;
+
+  // Get Detail Information of Story
   detailStory(title: string): any;
+
+  // Get content of chapter of story
   contentStory(title: string, chap?: string): any;
-  // newestStory(limiter?: number, page?: string): any;
-  // fullStory(limiter?: number, page?: string): any;
-  // hotStory(limiter?: number, page?: string): any;
+
+  // Get all categories of website
   categoryList(type?: string): any;
+
+  // Get all chapters of a story
   chapterList(title: string, page?: string): any;
+
+  // Get story by types of website
   selectStoryList(type: string, limiter?: number, page?: string): any;
+
+  // Get home of this website
   home(): any;
+
+  // Get ne
   newestStoryAtCategory(category: string, limiter?: number, page?: string): any;
   fullStoryAtCategory(category: string, limiter?: number, page?: string): any;
   hotStoryAtCategory(category: string, limiter?: number, page?: string): any;
+
+  // Get detail of story that only know name from this website
   changeDetailStoryToThisDataSource(title: string): any;
+
+  // Get content of chapter of story that only know name from this website
   changeContentStoryToThisDataSource(title: string, chap?: string): any;
 }

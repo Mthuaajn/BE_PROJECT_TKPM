@@ -14,6 +14,8 @@ import {
   listCategory,
   listChapter
 } from '~/controllers/DataSource.controllers';
+
+//This router is used for routing request to crawl data controllers
 const dataSourceRouter = Router();
 
 dataSourceRouter.get('/search/*', search);
