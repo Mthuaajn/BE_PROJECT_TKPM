@@ -7,7 +7,12 @@ import fs from 'fs';
 //   transpileOnly: true,
 // });
 //const fileUtils = require('../../utils/FileUtility');
-import { getFileNamesInFolder, removeFileExtension } from '../../utils/FileUtility';
+import {
+  getFileNamesInFolder,
+  readDirectChildFolder,
+  removeFileExtension
+} from '../../utils/FileUtility';
+import { MetaData } from '../Interfaces/MetaData';
 
 const dataSourcePluginFolder = path.join(__dirname, '../DataSourcePlugin/'); //"/models/DataSourcePlugin/";//
 
@@ -73,11 +78,11 @@ export class DataSourceFactory {
   // load all plugin from a folder
   public loadPlugins(folderPath: string) {
     try {
-      const fileNames: string[] = getFileNamesInFolder(folderPath);
-      for (const name of fileNames) {
-        console.log('load plugin name: ', name);
-        const plugin: IDataSourcePlugin = this.loadPluginFromFileName(name, folderPath);
-        this.registerDataSourcePlugin(removeFileExtension(name), plugin);
+      const folderNames: string[] = readDirectChildFolder(folderPath);
+      for (const name of folderNames) {
+        console.log('load plugin name: ', path.basename(name));
+        const plugin: IDataSourcePlugin = this.loadPluginFromFolderName(name);
+        this.registerDataSourcePlugin(path.basename(name), plugin);
       }
     } catch (error) {
       console.log(error);
@@ -92,35 +97,61 @@ export class DataSourceFactory {
   public runPlugins(): void {
     this.dataSourceMap.forEach((value, key) => {
       console.log(`Running plugin ${key} ...`);
-      value.search(key);
     });
   }
 
   // Load one plugin
   private loadPluginFromFileName(pluginName: string, folderPath: string): IDataSourcePlugin {
-    // const pluginFilePath = `file://${path.join(dataSourcePluginFolder, pluginName)}`;
-
     const pluginFile = path.join(folderPath, pluginName);
-    //console.log('pluginFile: ', path.join(dataSourcePluginFolder, removeFileExtension(pluginName)));
 
     const moduleName = removeFileExtension(pluginName);
-    //console.log('module: ', moduleName);
+
     if (fs.existsSync(pluginFile)) {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      //const  PluginClass = require(pluginFile).default;
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { plugin: PluginClass } = require(pluginFile);
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      // const { listStory: listStoryStrategy } = require(pluginFile);
-      // const test = new listStoryStrategy(PluginClass.baseUrl);
-      // console.log(test.getBaseUrl());
-      //console.log("PluginClass: ",PluginClass);
-      // const importedModule = await import(pluginFilePath);
-      // console.log(importedModule);
-      //const PluginClass = importedModule.default;
-      //return new PluginClass(pluginName);
+
       return new PluginClass(moduleName);
     }
     throw new Error(`Plugin not found: ${pluginName}`);
+  }
+
+  private loadPluginFromFolderName(pluginFolderName: string): IDataSourcePlugin {
+    const metadataPath = path.join(pluginFolderName, 'metadata.json');
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8')) as Record<string, string>;
+
+    const dataSourcePluginPath = path.join(pluginFolderName + '/src', metadata.IDataSourcePlugin);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const dataSourcePluginClass = require(dataSourcePluginPath).default;
+
+    const baseUrl: string = dataSourcePluginClass.baseUrl;
+    //console.log('baseUrl: ', baseUrl);
+    //console.log('dataSourcePluginPath: ', dataSourcePluginPath);
+    // console.log('dataSourcePluginClass: ', dataSourcePluginClass);
+    const instances: Record<string, any> = {}; //[string, any] = [];
+
+    for (const key in metadata) {
+      if (key !== 'IDataSourcePlugin') {
+        //console.log('key: ', key);
+        const filePath = path.join(pluginFolderName + '/src', metadata[key]);
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const ClassToInstantiate = require(filePath).default;
+        //console.log('filePath: ', filePath);
+        //console.log('ClassToInstantiate: ', ClassToInstantiate);
+        instances[key] = new ClassToInstantiate(baseUrl);
+      }
+    }
+
+    //console.log('instances: ', instances);
+    const moduleName = removeFileExtension(metadata.IDataSourcePlugin);
+    const pluginInstance: IDataSourcePlugin = new dataSourcePluginClass(
+      moduleName,
+      instances.ICategoryList,
+      instances.IContentStory,
+      instances.IDetailStory,
+      instances.IListStoryStrategy,
+      instances.ISearchStory
+    );
+
+    return pluginInstance;
   }
 }

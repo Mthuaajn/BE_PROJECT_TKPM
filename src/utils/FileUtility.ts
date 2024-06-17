@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-
+import path from 'path';
 export function getFileNamesInFolder(folderPath: string): string[] {
   try {
     //console.log("folderPath: ",folderPath);
@@ -31,6 +31,14 @@ export function deleteFile(filePath: string): void {
       console.log('File deleted successfully: ', filePath);
     }
   });
+}
+export function readDirectChildFolder(folderPath: string): string[] {
+  const childFolders: string[] = fs
+    .readdirSync(folderPath, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => path.join(folderPath, dirent.name));
+
+  return childFolders;
 }
 
 // module.exports = {

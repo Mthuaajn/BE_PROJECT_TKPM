@@ -17,3 +17,22 @@ export function convertToUnicodeAndCreateURL(input: string): string {
 
   return url;
 }
+export function getNumberValueFromString(input: string): number {
+  const numberPattern = /\d+/; // Regular expression to match one or more digits
+
+  const match = input.match(numberPattern);
+  if (match) {
+    const integerValue = parseInt(match[0], 10);
+    return integerValue;
+  } else {
+    //console.log('No integer value found');
+    return -1;
+  }
+}
+export function removeVietnameseAccents(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D');
+}

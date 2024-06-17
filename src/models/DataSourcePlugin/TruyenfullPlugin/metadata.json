@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "TruyenfullPlugin.ts",
+    "ICategoryList": "TruyenfullCategoryList.ts",
+    "IContentStory": "TruyenfullContentStory.ts",
+    "IDetailStory": "TruyenfullDetailStory.ts",
+    "IListStoryStrategy": "TruyenfullListStoryStrategy.ts",
+    "ISearchStory": "TruyenfullSearchStory.ts"
+}
