@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "NoveltoonPlugin.ts",
+    "ICategoryList": "NoveltoonCategoryList.ts",
+    "IContentStory": "NoveltoonContentStory.ts",
+    "IDetailStory": "NoveltoonDetailStory.ts",
+    "IListStoryStrategy": "NoveltoonListStoryStrategy.ts",
+    "ISearchStory": "NoveltoonSearchStory.ts"
+}
