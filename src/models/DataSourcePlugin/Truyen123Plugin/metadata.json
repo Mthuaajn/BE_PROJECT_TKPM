@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "Truyen123Plugin.ts",
+    "ICategoryList": "Truyen123CategoryList.ts",
+    "IContentStory": "Truyen123ContentStory.ts",
+    "IDetailStory": "Truyen123DetailStory.ts",
+    "IListStoryStrategy": "Truyen123ListStoryStrategy.ts",
+    "ISearchStory": "Truyen123SearchStory.ts"
+}
