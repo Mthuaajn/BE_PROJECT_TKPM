@@ -10,8 +10,9 @@ export default class Truyen123ListStoryStrategy implements IListStoryStrategy {
     this.baseUrl = url;
     this.name = 'Truyen123ListStoryStrategy';
     this.listStoryMap = new Map<string, (limiter?: number, page?: string) => any>();
-    this.register('newest', this.newestStory);
+
     this.register('hot', this.hotStory);
+    this.register('newest', this.newestStory);
     this.register('full', this.fullStory);
   }
   getBaseUrl(): string {
