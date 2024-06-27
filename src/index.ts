@@ -85,6 +85,12 @@ app.use(express.json());
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
 
+import { createFile } from './converter/wav';
+app.use('/test', async (req, res) => {
+  await createFile('title', '1', 'content');
+  res.json({ msg: 'You have accessed to this server to save wav!' });
+});
+
 app.use('/', async (req, res) => {
   res.json({ msg: 'You have accessed to this server successfully!' });
 });
@@ -93,5 +99,6 @@ app.use('*', defaultErrorHandlers);
 app.listen(port, host, () => {
   console.log(`app running on port http://${host}:${port}/`);
 });
+
 
 export default app;
