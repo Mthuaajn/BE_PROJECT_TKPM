@@ -11,11 +11,11 @@ export interface IDataSourcePlugin {
   name: string;
 
   // List Strory of plugin
-  listStory: IListStoryStrategy;
-  listCategory: ICategoryList;
-  contentChapter: IContentStory;
-  storyDetail: IDetailStory;
-  searcher: ISearchStory;
+  listStory?: IListStoryStrategy;
+  listCategory?: ICategoryList;
+  contentChapter?: IContentStory;
+  storyDetail?: IDetailStory;
+  searcher?: ISearchStory;
 
   // Creata a clone instance of this plugin
   clone(name: string): IDataSourcePlugin;

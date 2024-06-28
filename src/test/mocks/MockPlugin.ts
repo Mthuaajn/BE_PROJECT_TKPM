@@ -1,4 +1,9 @@
+import { ICategoryList } from '~/models/DataSourceManagement/ICategoryList';
+import { IContentStory } from '~/models/DataSourceManagement/IContentStory';
 import { IDataSourcePlugin } from '~/models/DataSourceManagement/IDataSourcePlugin';
+import { IDetailStory } from '~/models/DataSourceManagement/IDetailStory';
+import { IListStoryStrategy } from '~/models/DataSourceManagement/IListStoryStrategy';
+import { ISearchStory } from '~/models/DataSourceManagement/ISearchStory';
 
 export class MockPlugin implements IDataSourcePlugin {
   name = 'MockPlugin';

@@ -11,6 +11,7 @@ import { FileExtensionFactory } from './models/FileExtensionManagement/FileExten
 import { FileExtensionManager } from './models/FileExtensionManagement/FileExtensionManager';
 import { IDataSourcePlugin } from './models/DataSourceManagement/IDataSourcePlugin';
 import { mostSearchStory } from './models/TestExtendTruyenfull';
+import { IListStoryStrategy } from './models/DataSourceManagement/IListStoryStrategy';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
@@ -35,7 +36,7 @@ dataSourceManager.printAllPlugins();
 
 const truyenfullPlugin: IDataSourcePlugin | null = dataSourceManager.select('TruyenfullPlugin');
 if (truyenfullPlugin != null) {
-  truyenfullPlugin.listStory.register('most search', mostSearchStory);
+  (truyenfullPlugin.listStory as IListStoryStrategy).register('most search', mostSearchStory);
   dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
 }
 
