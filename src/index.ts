@@ -151,6 +151,7 @@ app.use('/api/v1/downloadAudio/', fileExtensionAudioRouter);
 
 import { ChapterImage } from './models/Interfaces/ChapterImage';
 import createFile from './test';
+import { IListStoryStrategy } from './models/DataSourceManagement/IListStoryStrategy';
 
 app.use('/test', async (req, res) => {
   const content: ChapterImage[] = [
