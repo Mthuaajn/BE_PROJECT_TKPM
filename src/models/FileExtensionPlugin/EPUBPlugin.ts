@@ -1,9 +1,5 @@
-import { error } from 'console';
 import { IFileExtensionPlugin } from '../FileExtensionManagement/IFileExtensionPlugin';
-import * as fs from 'fs';
 import Epub = require('epub-gen');
-import { before } from 'lodash';
-import { promisify } from 'util'; //import { EPub } from 'epub-generator';
 
 //This plugin is used for create file EPUB
 export class EPUBPlugin implements IFileExtensionPlugin {
@@ -29,16 +25,6 @@ export class EPUBPlugin implements IFileExtensionPlugin {
       ]
     };
 
-    // return new Promise<string | null>(async (resolve, reject) => {
-    //   try {
-    //     const epub = new EPub(options, filePath);
-    //     await promisify(epub.generate.bind(epub))(); // Generate the EPub file
-    //     resolve(filePath);
-    //   } catch (err) {
-    //     console.log('Error writing file:', err);
-    //     reject(err);
-    //   }
-    // });
     try {
       const epub = await new Epub(options, filePath).promise;
 

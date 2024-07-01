@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "OTruyenPlugin.ts",
+    "ICategoryList": "OTruyenCategoryList.ts",
+    "IContentStory": "OTruyenContentStory.ts",
+    "IDetailStory": "OTruyenDetailStory.ts",
+    "IListStoryStrategy": "OTruyenListStoryStrategy.ts",
+    "ISearchStory": "OTruyenSearchStory.ts"
+}

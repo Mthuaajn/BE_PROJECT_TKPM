@@ -6,7 +6,7 @@ export default class NoveltoonSearchStory implements ISearchStory {
   name: string;
   baseUrl: string;
   public constructor(url: string) {
-    this.name = 'NoveltoonCategoryList';
+    this.name = 'NoveltoonSearchStory';
     this.baseUrl = url;
   }
   clone(): ISearchStory {

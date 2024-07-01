@@ -11,4 +11,5 @@ export interface DetailStory {
   host: string;
   categoryList: Category[];
   description: string;
+  format?: string;
 }
