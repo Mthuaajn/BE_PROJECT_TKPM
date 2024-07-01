@@ -1,36 +1,36 @@
-import { IFileExtensionComicsPlugin } from './IFileExtensionComicsPlugin';
+import { IFileExtensionAudioPlugin } from "./IFileExtensionAudioPlugin";
 
 //This class is used for manage downloading story plugin
-export class FileExtensionComicsManager {
+export class FileExtensionAudioManager {
   // Instance of this class, used for singleton design pattern
-  private static instance: FileExtensionComicsManager;
+  private static instance: FileExtensionAudioManager;
 
   // Map used for manage the plugin
-  private fileExtensionPlugin: Map<string, IFileExtensionComicsPlugin>;
+  private fileExtensionPlugin: Map<string, IFileExtensionAudioPlugin>;
 
   private constructor() {
-    this.fileExtensionPlugin = new Map<string, IFileExtensionComicsPlugin>();
+    this.fileExtensionPlugin = new Map<string, IFileExtensionAudioPlugin>();
   }
 
   // Get instance of this class using singleton pattern
-  public static getInstance(): FileExtensionComicsManager {
-    if (!FileExtensionComicsManager.instance) {
-      FileExtensionComicsManager.instance = new FileExtensionComicsManager();
+  public static getInstance(): FileExtensionAudioManager {
+    if (!FileExtensionAudioManager.instance) {
+        FileExtensionAudioManager.instance = new FileExtensionAudioManager();
     }
 
-    return FileExtensionComicsManager.instance;
+    return FileExtensionAudioManager.instance;
   }
 
   // Register a new plugin
   public registerFileExtensionPlugin(
     name: string,
-    fileExtensionPlugin: IFileExtensionComicsPlugin
+    fileExtensionPlugin: IFileExtensionAudioPlugin
   ): void {
     this.fileExtensionPlugin.set(name, fileExtensionPlugin);
   }
 
   // Get a registered plugin in this class
-  public select(name: string): IFileExtensionComicsPlugin | null {
+  public select(name: string): IFileExtensionAudioPlugin | null {
     if (this.fileExtensionPlugin.has(name)) {
       return this.fileExtensionPlugin.get(name) ?? null;
     }
@@ -43,26 +43,26 @@ export class FileExtensionComicsManager {
   }
 
   // Get plugin map
-  public getDFileExtensionMap(): Map<string, IFileExtensionComicsPlugin> | null {
+  public getDFileExtensionMap(): Map<string, IFileExtensionAudioPlugin> | null {
     return this.fileExtensionPlugin;
   }
 
   // Set Plugin map
-  public setFileExtensionMap(map: Map<string, IFileExtensionComicsPlugin>): void {
+  public setFileExtensionMap(map: Map<string, IFileExtensionAudioPlugin>): void {
     this.fileExtensionPlugin = map;
   }
 
   // Create a clone plugin map and set it to this class's plugin map
-  public setCloneFileExtensionMap(map: Map<string, IFileExtensionComicsPlugin>): void {
+  public setCloneFileExtensionMap(map: Map<string, IFileExtensionAudioPlugin>): void {
     //this.dataSourcePlugin = new Map<string, IDataSourcePlugin>(map);
     //this.dataSourcePlugin = this.deepCopyMap(map);
     this.fileExtensionPlugin = this.cloneDataSourceMap(map);
   }
 
   private cloneDataSourceMap(
-    originalMap: Map<string, IFileExtensionComicsPlugin>
-  ): Map<string, IFileExtensionComicsPlugin> {
-    const newMap = new Map<string, IFileExtensionComicsPlugin>();
+    originalMap: Map<string, IFileExtensionAudioPlugin>
+  ): Map<string, IFileExtensionAudioPlugin> {
+    const newMap = new Map<string, IFileExtensionAudioPlugin>();
 
     originalMap.forEach((value, key) => {
       newMap.set(key, value.clone());
@@ -89,9 +89,9 @@ export class FileExtensionComicsManager {
   }
 
   private deepCopyMap(
-    originalMap: Map<string, IFileExtensionComicsPlugin>
-  ): Map<string, IFileExtensionComicsPlugin> {
-    const newMap = new Map<string, IFileExtensionComicsPlugin>();
+    originalMap: Map<string, IFileExtensionAudioPlugin>
+  ): Map<string, IFileExtensionAudioPlugin> {
+    const newMap = new Map<string, IFileExtensionAudioPlugin>();
 
     for (const [key, value] of originalMap.entries()) {
       const clonedValue = this.cloneObject(value);
@@ -116,7 +116,7 @@ export class FileExtensionComicsManager {
   public getAllPluginName(): string[] {
     const list: string[] = [];
     this.fileExtensionPlugin.forEach((value, key) => {
-      const str: string = value.name.replace(/ComicsPlugin/g, '');
+      const str: string = value.name.replace(/AudioPlugin/g, '');
       list.push(str);
     });
 

@@ -1,119 +1,45 @@
-import * as puppeteer from 'puppeteer';
-import { ChapterImage } from './models/Interfaces/ChapterImage';
 import axios from 'axios';
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from '@ffmpeg-installer/ffmpeg';
+import fs from 'fs';
 
-function sanitizeTitle(title: string): string {
-  // Thay thế các ký tự không hợp lệ thành ký tự hợp lệ có dấu _
-  return title.replace(/[^a-zA-Z0-9 \-_]/g, '_');
+ffmpeg.setFfmpegPath(ffmpegPath.path);
+
+const videoUrl =
+  'https://ia800308.us.archive.org/14/items/ThanBiKhoiPhucTuQuyHoBatDauTH/002-ThanBiKhoiPhucTuQuyHoBatDauTH.mp3';
+const startTime = '00:00:30'; // Start time of the desired portion
+const endTime = '00:01:30'; // End time of the desired portion
+const outputFilePath = 'output.mp3'; // Output file path
+
+function downloadAndCutVideo(
+  url: string,
+  start: string,
+  end: string,
+  output: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ffmpeg(url)
+      .setStartTime(start)
+      .setDuration(end)
+      .output(output)
+      .on('end', () => {
+        console.log('Video cut and saved successfully.');
+        resolve();
+      })
+      .on('error', (error) => {
+        console.error('Error cutting video:', error);
+        reject(error);
+      })
+      .run();
+  });
 }
 
-export async function createFile(
-  title: string,
-  chapter: string,
-  content: ChapterImage[],
-  chapterTitle: string
-): Promise<any> {
-  title = sanitizeTitle(title);
-  const filePath = `downloadedFile/${title}_${chapter}.pdf`;
-
+async function createFile() {
   try {
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    const page = await browser.newPage();
-
-    const pdfOptions = {
-      path: filePath,
-      format: 'A4'
-    };
-
-    // const pdfPromises = content.map(async (element: ChapterImage) => {
-    //   await page.goto(element.image_file);
-    //   await page.waitForSelector('img');
-    //   const imageHandle = await page.$('img');
-    //   const imageBuffer = await imageHandle?.screenshot();
-    //   return imageBuffer;
-    // });
-
-    const pdfPromises = await fetchImageBuffers(content);
- 
-    const imageBuffers = await Promise.all(pdfPromises);
-
-    const htmlContent = `
-        <html>
-          <head>
-            <title>${title}</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                margin: 40px;
-              }
-              h1 {
-                font-size: 24px;
-                margin-bottom: 20px;
-              }
-              h3 {
-                font-size: 18px;
-                margin-bottom: 20px;
-              }
-              p {
-                font-size: 12px;
-                line-height: 1.5;
-              }
-            </style>
-          </head>
-          <body>
-            <h1>${title}</h1>
-            <h3>${chapterTitle}</h3>
-            <p>Content: </p>
-            ${getImageTags(imageBuffers)}
-          </body>
-        </html>`;
-
-    await page.setContent(htmlContent, { waitUntil: 'networkidle2', timeout: 60000 });
-
-    await page.pdf({
-      path: filePath,
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '40px',
-        bottom: '40px',
-        left: '40px',
-        right: '40px'
-      }
-    });
-
-    await browser.close();
-
-    return filePath;
-  } catch (err) {
-    console.log('Error writing file:', err);
-    return null;
+    await downloadAndCutVideo(videoUrl, startTime, endTime, outputFilePath);
+  } catch (error) {
+    console.error('Error occurred:', error);
   }
 }
 
-async function fetchImageBuffers(imageUrls: ChapterImage[]): Promise<Buffer[]> {
-  const imageRequests = imageUrls.map(async (imageUrl: ChapterImage) => {
-    const response = await axios.get(imageUrl.image_file, { responseType: 'arraybuffer' });
-    return Buffer.from(response.data, 'binary');
-  });
-
-  return Promise.all(imageRequests);
-}
-
-// async function fetchImage(url: string) {
-//     const image = await fetch(url, { responseType: "arraybuffer" });
-//     return image.data;
-//   }
-
-function getImageTags(imageBuffers: Buffer[]): string {
-  return imageBuffers
-    .map((buffer) => {
-      if (buffer && buffer != undefined) {
-        const base64 = buffer.toString('base64');
-        return `<div class="image-container"><img src="data:image/jpeg;base64,${base64}"></div>`;
-      }
-    })
-    .join('');
-}
+export default createFile;

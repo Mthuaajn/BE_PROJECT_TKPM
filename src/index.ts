@@ -5,7 +5,6 @@ import { DataSourceFactory } from './models/DataSourceManagement/DataSourceFacto
 import { DataSourceManager } from './models/DataSourceManagement/DataSourceManager';
 import path from 'path';
 import { FileWatcher } from './models/FileWatcher';
-import { hostname } from 'os';
 import fileExtensionRouter from './routes/FileExtension.routes';
 import { FileExtensionFactory } from './models/FileExtensionManagement/FileExtensionFactory';
 import { FileExtensionManager } from './models/FileExtensionManagement/FileExtensionManager';
@@ -14,6 +13,10 @@ import { mostSearchStory } from './models/TestExtendTruyenfull';
 import { FileExtensionComicsFactory } from './models/FileExtensionComicsManagement/FileExtensionComicsFactory';
 import { FileExtensionComicsManager } from './models/FileExtensionComicsManagement/FileExtensionComicsManager';
 import fileExtensionComicsRouter from './routes/FileExtensionComics.routes';
+import fileExtensionAudioRouter from './routes/FileExtensionAudio.routes';
+import { FileExtensionAudioFactory } from './models/FileExtensionAudioManagement/FileExtensionAudioFactory';
+import { FileExtensionAudioManager } from './models/FileExtensionAudioManagement/FileExtensionAudioManager';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
@@ -30,6 +33,10 @@ const directoryOfFileExtensionPlugin = path.join(__dirname, '/models/FileExtensi
 const directoryOfFileExtensionComicsPlugin = path.join(
   __dirname,
   '/models/FileExtensionComicsPlugin'
+);
+const directoryOfFileExtensionAudioPlugin = path.join(
+  __dirname,
+  '/models/FileExtensionAudioPlugin'
 );
 
 const dataSourceFactory = DataSourceFactory.getInstance();
@@ -110,14 +117,40 @@ fileWatcherForFileExtensionComicsPlugin.on('fileAdded', async () => {
   console.log('All file extension plugins for comics are running ...');
 });
 
+const fileExtensionAudioFactory: FileExtensionAudioFactory =
+  FileExtensionAudioFactory.getInstance();
+const fileExtensionAudioManager: FileExtensionAudioManager =
+  FileExtensionAudioManager.getInstance();
+
+fileExtensionAudioFactory.loadPlugins(directoryOfFileExtensionAudioPlugin);
+fileExtensionAudioManager.setFileExtensionMap(fileExtensionAudioFactory.cloneAllPlugins());
+fileExtensionAudioManager.printAllPlugins();
+
+const fileWatcherForFileExtensionAudioPlugin: FileWatcher = new FileWatcher(
+  directoryOfFileExtensionAudioPlugin
+);
+fileWatcherForFileExtensionAudioPlugin.startWatching();
+
+fileWatcherForFileExtensionAudioPlugin.on('fileAdded', async () => {
+  fileExtensionAudioFactory.clearAllPlugins();
+  fileExtensionAudioManager.clearAllPlugins();
+
+  await fileExtensionAudioFactory.loadPlugins(directoryOfFileExtensionAudioPlugin);
+  fileExtensionAudioManager.setFileExtensionMap(fileExtensionAudioFactory.cloneAllPlugins());
+  fileExtensionAudioManager.printAllPlugins();
+
+  console.log('All file extension plugins for audio are running ...');
+});
+
 app.use(express.json());
 
 app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
 app.use('/api/v1/downloadComics/', fileExtensionComicsRouter);
+app.use('/api/v1/downloadAudio/', fileExtensionAudioRouter);
 
-import { createFile } from './test';
 import { ChapterImage } from './models/Interfaces/ChapterImage';
+import createFile from './test';
 
 app.use('/test', async (req, res) => {
   const content: ChapterImage[] = [
@@ -523,8 +556,8 @@ app.use('/test', async (req, res) => {
     }
   ];
 
-  await createFile('title', '12', content, 'chapterTitle');
-  res.json({ msg: 'You have accessed to save pdf file!' });
+  await createFile();
+  res.json({ msg: 'You have accessed to save mp3 file!' });
 });
 
 app.use('/', async (req, res) => {
