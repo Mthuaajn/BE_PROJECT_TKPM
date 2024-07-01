@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "TangThuVienPlugin.ts",
+    "ICategoryList": "TangThuVienCategoryList.ts",
+    "IContentStory": "TangThuVienContentStory.ts",
+    "IDetailStory": "TangThuVienDetailStory.ts",
+    "IListStoryStrategy": "TangThuVienListStoryStrategy.ts",
+    "ISearchStory": "TangThuVienSearchStory.ts"
+}
