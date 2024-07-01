@@ -11,4 +11,5 @@ export interface Story {
   authorLink: string;
   view: string;
   categoryList: Category[];
+  format?: string;
 }

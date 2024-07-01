@@ -1,0 +1,8 @@
+{
+    "IDataSourcePlugin": "AudioTruyenfullPlugin.ts",
+    "ICategoryList": "AudioTruyenfullCategoryList.ts",
+    "IContentStory": "AudioTruyenfullContentStory.ts",
+    "IDetailStory": "AudioTruyenfullDetailStory.ts",
+    "IListStoryStrategy": "AudioTruyenfullListStoryStrategy.ts",
+    "ISearchStory": "AudioTruyenfullSearchStory.ts"
+}
