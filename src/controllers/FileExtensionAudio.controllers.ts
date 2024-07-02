@@ -63,10 +63,11 @@ export const downloadChapter = wrapRequestHandler(
 
           if (fileExtensionPlugin != null) {
             // Create file that has formatted file client want
+            //const stringWithoutSpaces = result.content.replace(/\s/g, '%20');
             const filePath = await fileExtensionPlugin.createFile(
               title,
               chap,
-              result.content,
+              result.content.replace(/\s/g, '%20'),
               startTimeNumber,
               endTimeNumber,
               result.chapterTitle ? result.chapterTitle : ''

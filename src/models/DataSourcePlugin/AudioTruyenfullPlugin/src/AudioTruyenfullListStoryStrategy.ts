@@ -74,7 +74,7 @@ export default class AudioTruyenfullListStoryStrategy implements IListStoryStrat
       }
     );
 
-    console.log('data: ', data.length);
+    //console.log('data: ', data.length);
     return data;
   }
   public fullStory = async (limiter?: number, page?: string): Promise<any> => {

@@ -105,7 +105,10 @@ export class PDFComicsPlugin implements IFileExtensionComicsPlugin {
   }
   public async fetchImageBuffers(imageUrls: ChapterImage[]): Promise<Buffer[]> {
     const imageRequests = imageUrls.map(async (imageUrl: ChapterImage) => {
-      const response = await axios.get(imageUrl.image_file, { responseType: 'arraybuffer' });
+      const response = await axios.get(imageUrl.image_file, {
+        responseType: 'arraybuffer',
+        proxy: false
+      });
       return Buffer.from(response.data, 'binary');
     });
 

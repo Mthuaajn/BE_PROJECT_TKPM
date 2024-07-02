@@ -53,6 +53,7 @@ export default class AudioTruyenfullContentStory implements IContentStory {
           const mp3Regex = /mp3:\s*"([^"]+)"/g;
           let match;
           while ((match = mp3Regex.exec(scriptContent)) !== null) {
+            //const stringWithoutSpaces = match[1].replace(/\s/g, '');
             mp3Links.push({ content: 'Tập ' + countChapter, href: match[1] });
             countChapter++;
           }
@@ -106,6 +107,7 @@ export default class AudioTruyenfullContentStory implements IContentStory {
           const mp3Regex = /mp3:\s*"([^"]+)"/g;
           let match;
           while ((match = mp3Regex.exec(scriptContent)) !== null) {
+           // const stringWithoutSpaces = match[1].replace(/\s/g, '');
             mp3Links.push({ content: 'Tập ' + countChapter, href: match[1] });
             countChapter++;
           }
