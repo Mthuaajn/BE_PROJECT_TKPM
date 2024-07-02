@@ -30,7 +30,7 @@ export class MP3Plugin implements IFileExtensionPlugin {
     const speed = '';
     const voice = 'ngoclam';
 
-    let payload = content.slice(0, 5000); //JSON.stringify(content);
+    let payload = content.slice(0, 500); //JSON.stringify(content);
     const lastSpaceIndex = payload.lastIndexOf(' ');
 
     if (lastSpaceIndex != -1) {
