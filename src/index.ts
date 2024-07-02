@@ -49,7 +49,7 @@ dataSourceManager.printAllPlugins();
 
 const truyenfullPlugin: IDataSourcePlugin | null = dataSourceManager.select('TruyenfullPlugin');
 if (truyenfullPlugin != null) {
-  truyenfullPlugin.listStory.register('most search', mostSearchStory);
+  (truyenfullPlugin.listStory as IListStoryStrategy).register('most search', mostSearchStory);
   dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
 }
 
@@ -151,6 +151,7 @@ app.use('/api/v1/downloadAudio/', fileExtensionAudioRouter);
 
 import { ChapterImage } from './models/Interfaces/ChapterImage';
 import createFile from './test';
+import { IListStoryStrategy } from './models/DataSourceManagement/IListStoryStrategy';
 
 app.use('/test', async (req, res) => {
   const content: ChapterImage[] = [
