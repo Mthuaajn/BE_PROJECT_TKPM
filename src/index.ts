@@ -17,8 +17,6 @@ import fileExtensionAudioRouter from './routes/FileExtensionAudio.routes';
 import { FileExtensionAudioFactory } from './models/FileExtensionAudioManagement/FileExtensionAudioFactory';
 import { FileExtensionAudioManager } from './models/FileExtensionAudioManagement/FileExtensionAudioManager';
 import { IListStoryStrategy } from './models/DataSourceManagement/IListStoryStrategy';
-import { ChapterImage } from './models/Interfaces/ChapterImage';
-import createFile from './test';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const esmRequire = require('esm')(module /*, options*/);
 // esmRequire('./index.ts');
@@ -50,11 +48,11 @@ dataSourceManager.printAllPlugins();
 //dataSourceManager.runPlugins();
 
 // KHÔNG XÓA
-// const truyenfullPlugin: IDataSourcePlugin | null = dataSourceManager.select('TruyenfullPlugin');
-// if (truyenfullPlugin != null) {
-//   (truyenfullPlugin.listStory as IListStoryStrategy).register('most search', mostSearchStory);
-//   dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
-// }
+const truyenfullPlugin: IDataSourcePlugin | null = dataSourceManager.select('TruyenfullPlugin');
+if (truyenfullPlugin != null) {
+  (truyenfullPlugin.listStory as IListStoryStrategy).register('most search', mostSearchStory);
+  dataSourceManager.setDataSource(truyenfullPlugin.name, truyenfullPlugin);
+}
 
 const fileWatcher = new FileWatcher(directoryOfDataSourcePlugin);
 fileWatcher.startWatching();
@@ -151,11 +149,6 @@ app.use('/api/v1/', dataSourceRouter);
 app.use('/api/v1/download/', fileExtensionRouter);
 app.use('/api/v1/downloadComics/', fileExtensionComicsRouter);
 app.use('/api/v1/downloadAudio/', fileExtensionAudioRouter);
-
-app.use('/test', async (req, res) => {
-  await createFile();
-  res.json({ msg: 'You have accessed to save mp3 file!' });
-});
 
 app.use('/', async (req, res) => {
   res.json({ msg: 'You have accessed to this server successfully!' });
