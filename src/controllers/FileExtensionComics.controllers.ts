@@ -133,7 +133,8 @@ export const downloadChapter = wrapRequestHandler(
 // This function is used for handle request get all file formatted that server support to download
 export const listFileExtension = wrapRequestHandler(
   async (req: Request<ParamsDictionary, any>, res: Response, next: NextFunction) => {
-    const fileExtensionManager: FileExtensionComicsManager = FileExtensionComicsManager.getInstance();
+    const fileExtensionManager: FileExtensionComicsManager =
+      FileExtensionComicsManager.getInstance();
     const nameFileExtension: string[] = fileExtensionManager.getAllPluginName();
     const data: object = {
       length: nameFileExtension.length,
